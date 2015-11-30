@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">RC Speedo</string>
+    
+    <!-- UI/layout strings -->
+    <!--  Main Screen -->
+    <string name="main_title">RC Speedo</string>
+    <string name="speed_default">0 km/h</string>
+    <string name="highest_default">Velocidad récord: 0 km/h</string>
+    <string name="highest_speed">Velocidad récord:</string>
+    <string name="logging_status_startup">No registrando</string>
+    <string name="temperature_default">Temperature: 0C</string>
+    <string name="start_listening">Iniciar escucha</string>
+    <string name="stop_listening">Dejar de escuchar</string>
+    <string name="start_logging">Iniciar Grabación</string>
+    <string name="stop_logging">Dejar de grabando</string>
+    <string name="logging_to">Grabación:</string>
+    
+    <!--  Main Menu -->
+    <string name="clear_speeds">Borrar velocidades</string>
+    <string name="settings">Configuración</string>
+    <string name="help">Ayuda</string>
+    <string name="hobbyking">HobbyKing</string>
+    
+    <!--  Logging Dialog-->
+    <string name="logging">Grabando</string>
+    <string name="log_title">Administrador de Grabaciones</string>
+    <string name="log_colon">Grabación: </string>
+    <string name="model_name">Nombre del modelo:</string>
+    <string name="log_name">Nombre de la grabación:</string>
+    <string name="status">Estado: </string>
+    <string name="default_status">No registrando</string>
+    <string name="number_entries">Número de grabaciones: </string>
+    <string name="create_new_log">Crear Grabación</string>
+    <string name="delete_log">Borrar grabación</string>
+    <string name="email_log">Enviar por e-mail</string>
+    <string name="none">Ninguno</string>
+    <string name="airplane">Avión</string>
+    <string name="pick_log">Seleccionar grabación</string>
+    
+    <!--  Create Log Dialog-->
+    <string name="log_name_hint">Ex: F-16 Log #1</string>
+    <string name="model_name_hint">Ex: Phase 3 F-16</string>
+    <string name="create_log">Crear Grabación</string>
+    
+    <!-- Pick Log Dialog -->
+    <string name="logsel_prompt">Seleccionar grabación</string>
+    <string name="use_log">Usar grabación</string>
+    <string name="log_manager">Administrador de Grabaciones</string>
+    <string name="cancel">Cancelar</string>
+    
+    <!--  Settings Dialog -->
+    <string name="settings_title">Configuración</string>
+    <string name="enable_sounds">Activar Sonidos</string>
+    <string name="enable_sounds_desc">Activar/desactivar sonido indicador de velocidades</string>
+    <string name="change_doppler_mode">Cambiar modo de Doppler</string>
+    <string name="change_doppler_mode_desc">Los diferentes modos pueden producir velocidades divergentes, dependiente del tipo de avión y condiciones de vuelo</string>
+    <string name="change_units_of_speed">Cambiar unidad de velocidad</string>
+    <string name="change_units_of_speed_desc">Seleccionar entre MPH y km/h.</string>
+    <string name="change_temperature_unit">Cambiar unidad de temperatura</string>
+    <string name="change_temperature_unit_desc">Seleccionar entre °C y °F.</string>
+    <string name="enable_gps">Activar GPS</string>
+    <string name="enable_gps_desc">Usar GPS integrado para detectar la temperatura local.</string>
+    <string name="temperature">Temperatura</string>
+    <string name="temperature_desc">Insertar manualmente temperatura (desactivará GPS).</string>
+    
+    <!-- Error messages -->
+    <string name="err_no_mic">No se puede utilizar el micrófono del teléfono.</string>
+    <string name="err_no_logs">No grabando.</string>
+	<string name="err_no_log_selected">No grabando.</string>
+	<string name="err_cannot_create_log">No hay memoria en su dispositivo.</string>
+	<string name="err_name_required">No grabando.</string>
+	<string name="err_log_exists">El nombre ya existe.</string>
+	<string name="err_cannot_load_log">No grabando.</string>
+	<string name="err_temp_not_number">No es la temperatura.</string>
+	<string name="err_unlocker_default">Error unlocking app.</string>
+	<string name="err_unlocker_unknown">Unknown error unlocking app.</string>
+	<string name="err_no_google_account">Cannot Unlock: No Google Account</string>
+	
+	<string name="mail_speed_subject">RCSpeedo High Speed</string>
+	<string name="mail_speed_pretext_no_model">My model airplane clocked </string>
+	<string name="mail_speed_pretext_1">My </string>
+	<string name="mail_speed_pretext_2"> clocked </string>
+	<string name="mail_speed_promotionals"> on the Android #RCSpeedo App</string>
+	
+	<string name="cnfrm_title">Por favor confirmar.</string>
+	<string name="cnfrm_body">Por favor confirmar.</string>
+	
+	<string name="ok">Aprobado</string>
+	<string name="yes">sí</string>
+	<string name="no">no</string>
+	
+	<string-array name="available_modes"><item>Normal</item>
+		<item>Modo 100MPH+</item>
+		<item>Modo Fast Pass</item>
+	</string-array>
+	<string-array name="available_mode_ids"><item>default_mode</item>
+		<item>hi_speed_mode</item>
+		<item>fast_pass_mode</item>
+	</string-array>
+	<string-array name="available_speed_units_vocal">
+	    <item>Millas por hora</item>
+		<item>Kilómetros por hora</item>
+	    <item>Metros por segundo</item>
+	</string-array>
+	<string-array name="available_temp_units">
+	    <item>Fahrenheit</item>
+	    <item>Celsius</item>
+	</string-array>
+</resources>

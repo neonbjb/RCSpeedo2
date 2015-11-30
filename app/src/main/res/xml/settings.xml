@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+<CheckBoxPreference android:title="@string/enable_sounds" 
+    				android:key="sounds_enable" 
+    				android:summary="@string/enable_sounds_desc" 
+    				android:defaultValue="true"></CheckBoxPreference>
+<ListPreference android:key="change_mode" 
+    			android:title="@string/change_doppler_mode" 
+    			android:summary="@string/change_doppler_mode_desc" 
+    			android:entryValues="@array/available_mode_ids" 
+    			android:entries="@array/available_modes" 
+    			android:defaultValue="default_mode"></ListPreference>
+<ListPreference android:key="speed_unit" 
+    			android:title="@string/change_units_of_speed" 
+    			android:summary="@string/change_units_of_speed_desc" 
+    			android:entryValues="@array/available_speed_units" 
+    			android:entries="@array/available_speed_units" 
+    			android:defaultValue="MPH"></ListPreference>
+<ListPreference android:key="temperature_unit" 
+    			android:title="@string/change_temperature_unit" 
+    			android:summary="@string/change_temperature_unit_desc" 
+    			android:entryValues="@array/available_temp_units" 
+    			android:entries="@array/available_temp_units" 
+    			android:defaultValue="Fahrenheit"></ListPreference>
+<CheckBoxPreference android:title="@string/enable_gps" 
+    			android:key="enable_gps" 
+    			android:summary="@string/enable_gps_desc" 
+    			android:defaultValue="true"></CheckBoxPreference>
+<EditTextPreference android:title="@string/temperature" 
+    				android:key="hard_temp" 
+    				android:summary="@string/temperature_desc" 
+    				android:defaultValue="70"></EditTextPreference>
+</PreferenceScreen>

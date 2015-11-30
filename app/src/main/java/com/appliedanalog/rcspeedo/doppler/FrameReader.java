@@ -1,0 +1,1 @@
+package com.appliedanalog.rcspeedo.doppler;public interface FrameReader {	public short[] readFrame();}

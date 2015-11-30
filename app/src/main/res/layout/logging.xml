@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="left" >
+    <LinearLayout android:orientation="vertical"
+    			  android:gravity="left"
+    			  android:layout_width="fill_parent"
+    			  android:layout_height="wrap_content"
+    			  android:layout_alignParentTop="true"
+    			  android:layout_alignParentLeft="true">
+		<!-- For changing the current log -->
+		<RelativeLayout android:paddingTop="5px" 
+						android:orientation="horizontal" 
+						android:layout_width="fill_parent" 
+						android:layout_height="wrap_content">
+			<TextView android:id="@+id/lChangeLog" 
+					  android:layout_centerVertical="true" 
+					  android:text="@string/log_colon" 
+					  android:layout_width="wrap_content"
+					  android:paddingLeft="10px"
+					  android:layout_height="wrap_content" 
+					  android:layout_alignParentLeft="true"></TextView>
+			<Spinner android:id="@+id/lLogs" 
+					 android:prompt="@string/logsel_prompt"
+					 android:layout_width="fill_parent" 
+					 android:layout_height="wrap_content" 
+					 android:layout_alignParentRight="true" 
+					 android:layout_toRightOf="@id/lChangeLog"></Spinner>
+		</RelativeLayout>
+	
+		<!--  Model Name -->
+		<LinearLayout android:paddingTop="5px" 
+					  android:orientation="horizontal" 
+					  android:layout_width="wrap_content" 
+					  android:layout_height="wrap_content">
+			<TextView android:layout_centerVertical="true" 
+					  android:text="@string/model_name" 
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content" 
+					  android:layout_alignParentLeft="true"></TextView>
+			<TextView android:id="@+id/lModelName" 
+					  android:text="Default"
+					  android:paddingLeft="10px"
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content"></TextView>
+		</LinearLayout>
+		
+		<!--  Logging Status -->
+		<LinearLayout android:paddingTop="5px" 
+					  android:orientation="horizontal" 
+					  android:layout_width="wrap_content" 
+					  android:layout_height="wrap_content">
+			<TextView android:layout_centerVertical="true" 
+					  android:text="@string/status" 
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content" 
+					  android:layout_alignParentLeft="true"></TextView>
+			<TextView android:id="@+id/lLoggingStatus" 
+					  android:text="@string/default_status"
+					  android:textColor="#FF0000"
+					  android:paddingLeft="10px"
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content"></TextView>
+		</LinearLayout>
+		
+		<!-- Number of Entries -->
+		<LinearLayout android:paddingTop="5px" 
+					  android:orientation="horizontal" 
+					  android:layout_width="wrap_content" 
+					  android:layout_height="wrap_content">
+			<TextView android:layout_centerVertical="true" 
+					  android:text="@string/number_entries" 
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content" 
+					  android:layout_alignParentLeft="true"></TextView>
+			<TextView android:id="@+id/lNumberEntries" 
+					  android:text="0"
+					  android:paddingLeft="10px"
+					  android:layout_width="wrap_content"
+					  android:layout_height="wrap_content"></TextView>
+		</LinearLayout>
+	</LinearLayout>
+	
+	
+    <LinearLayout android:orientation="vertical"
+    			  android:gravity="left"
+    			  android:layout_width="fill_parent"
+    			  android:layout_height="wrap_content"
+    			  android:layout_alignParentBottom="true"
+    			  android:layout_alignParentLeft="true">
+		<!-- Creating and deleting logs -->
+		<RelativeLayout android:paddingTop="20px" 
+						android:orientation="horizontal" 
+						android:layout_width="fill_parent" 
+						android:layout_height="wrap_content">
+			<Button android:id="@+id/bCreateLog" 
+					android:text="@string/create_new_log" 
+					android:layout_width="fill_parent" 
+					android:layout_height="wrap_content"
+					android:layout_toLeftOf="@+id/bDeleteLog"></Button>
+			<Button android:id="@+id/bDeleteLog" 
+					android:text="@string/delete_log" 
+					android:layout_width="wrap_content" 
+					android:layout_height="wrap_content"
+					android:layout_alignParentRight="true"></Button>
+		</RelativeLayout>
+		<Button android:id="@+id/bEmailLog" 
+				android:text="@string/email_log" 
+				android:layout_width="fill_parent" 
+				android:layout_height="wrap_content"></Button>
+	</LinearLayout>
+</RelativeLayout>
