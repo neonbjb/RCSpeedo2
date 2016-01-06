@@ -1,12 +1,19 @@
-package com.appliedanalog.rcspeedo.logs;
+/*
+ * Copyright Applied Analog (c) 2015/2016
+ *
+ * This code is free for use in any non-commercial software. It carries
+ * no restrictions in such software.
+ */
 
-import java.util.Collection;
-import java.util.HashMap;
+package com.appliedanalog.rcspeedo.logs;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 public class LoggingDatabase extends SQLiteOpenHelper{
 	private static final String TBL = "logs";	

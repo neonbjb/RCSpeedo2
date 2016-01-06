@@ -1,9 +1,11 @@
-package com.appliedanalog.rcspeedo.logs;
+/*
+ * Copyright Applied Analog (c) 2015/2016
+ *
+ * This code is free for use in any non-commercial software. It carries
+ * no restrictions in such software.
+ */
 
-import java.util.Date;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+package com.appliedanalog.rcspeedo.logs;
 
 public abstract class LogEntry {
 	public static final int EMPTY_ENTRY = 1;
