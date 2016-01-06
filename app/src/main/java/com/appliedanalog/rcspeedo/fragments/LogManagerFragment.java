@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
-public class LogManager extends Fragment {
+public class LogManagerFragment extends Fragment {
 	
 	TextView tModelName;
 	TextView tLoggingStatus;

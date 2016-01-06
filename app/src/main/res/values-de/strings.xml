@@ -49,7 +49,7 @@
     <string name="log_manager">Aufzeichnungs-Manager</string>
     <string name="cancel">Cancel</string>
     
-    <!--  Settings Dialog -->
+    <!--  SettingsFragment Dialog -->
     <string name="settings_title">Einstellungen</string>
     <string name="enable_sounds">Töne aktivieren</string>
     <string name="enable_sounds_desc">Meldeton für Geschwindigkeitsmessungen an/ausschalten.</string>

@@ -17,11 +17,17 @@ import android.view.View;
 
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
-import com.appliedanalog.rcspeedo.fragments.LogManager;
+import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
 import com.appliedanalog.rcspeedo.fragments.MainFragment;
+import com.appliedanalog.rcspeedo.fragments.SettingsFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnFragmentInteractionListener {
+
+    // Fragments which can be swapped in and out on request
+    MainFragment mainFragment;
+    LogManagerFragment logFragment;
+    SettingsFragment settingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +55,13 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        //Initialize Strings localizer
+        Strings.init(getResources());
+
+        //initialize the unit manager
+        UnitManager.getInstance().init(this);
+
+        // Populate the fragment container.
         if (findViewById(R.id.fragment_container) != null) {
             // If we're being restored from a previous state,
             // then we don't need to do anything and should return or else
@@ -57,22 +70,10 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            // Create a new Fragment to be placed in the activity layout
-            MainFragment mainFragment = new MainFragment();
-
-            // In case this activity was started with special instructions from an
-            // Intent, pass the Intent's extras to the fragment as arguments
+            mainFragment = new MainFragment();
             mainFragment.setArguments(getIntent().getExtras());
-
-            // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mainFragment).commit();
         }
-
-        //Initialize Strings localizer
-        Strings.init(getResources());
-
-        //initialize the unit manager
-        UnitManager.getInstance().init(this);
     }
 
     @Override
@@ -106,12 +107,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.main_screen_nav_button) {
-            // Handle the camera action
+            loadNewFragment(mainFragment, false);
         } else if (id == R.id.log_manager_nav_button) {
-            LogManager logManagerFragment = new LogManager();
-            loadNewFragment(logManagerFragment, true);
+            loadNewFragment(logFragment, true);
         } else if (id == R.id.settings_nav_button) {
-
+            loadNewFragment(settingsFragment, true);
         } else if (id == R.id.help_nav_button) {
 
         }

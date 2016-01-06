@@ -49,7 +49,7 @@
     <string name="log_manager">Administrador de Grabaciones</string>
     <string name="cancel">Cancelar</string>
     
-    <!--  Settings Dialog -->
+    <!--  SettingsFragment Dialog -->
     <string name="settings_title">Configuración</string>
     <string name="enable_sounds">Activar Sonidos</string>
     <string name="enable_sounds_desc">Activar/desactivar sonido indicador de velocidades</string>

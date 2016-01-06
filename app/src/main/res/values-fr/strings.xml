@@ -49,7 +49,7 @@
     <string name="log_manager">Gestionnaire d’enregistrements</string>
     <string name="cancel">Annuler</string>
     
-    <!--  Settings Dialog -->
+    <!--  SettingsFragment Dialog -->
     <string name="settings_title">Réglages</string>
     <string name="enable_sounds">Activer le son</string>
     <string name="enable_sounds_desc">Activer/désactiver le son qui indique l’enregistrement des vitesses</string>

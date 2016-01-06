@@ -52,7 +52,7 @@
     <string name="log_manager">Log Manager</string>
     <string name="cancel">Cancel</string>
 
-    <!--  Settings Dialog -->
+    <!--  SettingsFragment Dialog -->
     <string name="settings_title">Settings</string>
     <string name="enable_sounds">Enable Sounds</string>
     <string name="enable_sounds_desc">Turn the voice that reports speeds on/off</string>
