@@ -56,10 +56,10 @@
             >
         </TextView>
         <TextView
-            android:id="@+id/tLogInUse"
+            android:id="@+id/tExtraStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/logging_status_startup"
+            android:text=""
             android:textSize="15dp"
             android:layout_below="@+id/tTemperature"
             android:layout_alignParentRight="true"
@@ -71,8 +71,8 @@
             android:id="@+id/lSpeeds"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_below="@+id/tLogInUse"
-            android:paddingBottom="60dp"
+            android:layout_below="@+id/tExtraStatus"
+            android:paddingTop="15dp"
             android:layout_alignParentLeft="true"
             >
         </ListView>

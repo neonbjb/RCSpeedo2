@@ -19,7 +19,9 @@ import android.widget.Toast;
 import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
+import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.views.SpeedViewAdapter;
 
 import java.util.Locale;
 
@@ -33,9 +35,10 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
     private TextView mSpeed;
     private TextView mHighestSpeed;
     private TextView mTemperature;
-    private TextView mLoggingStatus;
+    private TextView mStatus;
     private Button mAction;
     private ListView mSpeeds;
+    private SpeedViewAdapter mSpeedsAdapter;
 
     // Functional components.
     private TextToSpeech mTts;
@@ -72,7 +75,7 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
         mSpeed = (TextView)view.findViewById(R.id.tSpeed);
         mHighestSpeed = (TextView)view.findViewById(R.id.tHighestSpeed);
         mTemperature = (TextView)view.findViewById(R.id.tTemperature);
-        mLoggingStatus = (TextView)view.findViewById(R.id.tLogInUse);
+        mStatus = (TextView)view.findViewById(R.id.tExtraStatus);
         mSpeeds = (ListView)view.findViewById(R.id.lSpeeds);
 
         mAction = (Button)view.findViewById(R.id.bStart);
@@ -94,6 +97,9 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                 }
             }
         });
+
+        mSpeedsAdapter = new SpeedViewAdapter(getActivity());
+        mSpeeds.setAdapter(mSpeedsAdapter);
 
         return view;
     }
@@ -120,20 +126,21 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                     Toast toast = Toast.makeText(MainFragment.this.getContext(), aError, Toast.LENGTH_LONG);
                     toast.show();
                     // Show error in the logging status label too.
-                    mLoggingStatus.setText(aError);
+                    mStatus.setText(aError);
                 }
             }
         });
     }
 
     @Override
-    public void newSpeedDetected(final double aSpeedInMps) {
+    public void newSpeedDetected(final DetectedSpeed aSpeedInMps) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
-                mSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aSpeedInMps));
+                mSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aSpeedInMps.getSpeed()));
+                mSpeedsAdapter.add(aSpeedInMps);
                 if(mTtsReady && prefs.getBoolean(SettingsFragment.ENABLE_SOUND_KEY, true)) {
-                    String term = UnitManager.getInstance().getVocalSpeed(aSpeedInMps);
+                    String term = UnitManager.getInstance().getVocalSpeed(aSpeedInMps.getSpeed());
 
                     // Using the deprecated speak for backwards compatibility.
                     mTts.speak(term, TextToSpeech.QUEUE_FLUSH, null);
@@ -143,10 +150,21 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
     }
 
     @Override
-    public void highestSpeedChanged(final double aNewHighestSpeedMps) {
+    public void highestSpeedChanged(final DetectedSpeed aNewHighestSpeedMps) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                mHighestSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aNewHighestSpeedMps));
+                mHighestSpeed.setText(Strings.getInstance().HIGH_SPEED_IND +
+                                      UnitManager.getInstance().getDisplaySpeed(aNewHighestSpeedMps.getSpeed()));
+            }
+        });
+    }
+
+    @Override
+    public void speedInvalidated(final DetectedSpeed aSpeed) {
+        //@todo - Remove from list.
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                mSpeedsAdapter.remove(aSpeed);
             }
         });
     }

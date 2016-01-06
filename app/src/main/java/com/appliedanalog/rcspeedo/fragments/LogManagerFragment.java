@@ -53,7 +53,7 @@ public class LogManagerFragment extends Fragment {
         super.onCreate(savedInstanceState);
 		View view = inflater.inflate(R.layout.logging, container, false);
         
-        //instantiate local views
+        //instantiate local mViews
         tModelName = (TextView)view.findViewById(R.id.lModelName);
         tLoggingStatus = (TextView)view.findViewById(R.id.lLoggingStatus);
 		tNumberEntries = (TextView)view.findViewById(R.id.lNumberEntries);

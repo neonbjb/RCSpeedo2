@@ -2,6 +2,7 @@ package com.appliedanalog.rcspeedo.controllers;
 
 import android.util.Log;
 
+import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.doppler.AudioDoppler;
 import com.appliedanalog.rcspeedo.doppler.AudioDopplerConfiguration;
 
@@ -41,13 +42,19 @@ public class DopplerController implements Runnable {
          * Called when a new speed is detected.
          * @param aSpeedInMps Speed in meters/sec.
          */
-        public void newSpeedDetected(double aSpeedInMps);
+        public void newSpeedDetected(DetectedSpeed aSpeedInMps);
 
         /**
          * Called when the highest detected speed changes.
-         * @param aNewHighestSpeed New highest detected speed in meters/sec.
+         * @param aNewHighestSpeedMps New highest detected speed in meters/sec.
          */
-        public void highestSpeedChanged(double aNewHighestSpeedMps);
+        public void highestSpeedChanged(DetectedSpeed aNewHighestSpeedMps);
+
+        /**
+         * Called when a speed is removed from the active speed list managed by this controller.
+         * @param aSpeed
+         */
+        public void speedInvalidated(DetectedSpeed aSpeed);
 
     }
 
@@ -58,8 +65,9 @@ public class DopplerController implements Runnable {
     ArrayList<DopplerListener> mSpeedListeners;
     private boolean mIsActive;
 
-    ArrayList<Double> mSpeeds;
-    double mHighestSpeed;
+    // Object-level synchronization specifically protects this member.
+    ArrayList<DetectedSpeed> mSpeeds;
+    DetectedSpeed mHighestSpeed;
 
 
     // Singleton access.
@@ -81,8 +89,8 @@ public class DopplerController implements Runnable {
         mMicHandler = new MicHandler(FRAME_SIZE, SAMPLING_RATE);
         mSpeedListeners = new ArrayList<DopplerListener>();
         mIsActive = false;
-        mSpeeds = new ArrayList<Double>();
-        mHighestSpeed = 0;
+        mSpeeds = new ArrayList<DetectedSpeed>();
+        mHighestSpeed = new DetectedSpeed(0);
     }
 
     /**
@@ -144,6 +152,51 @@ public class DopplerController implements Runnable {
     }
 
     /**
+     * Call to clear all of the speeds being stored in this controller.
+     */
+    public void clearSpeeds() {
+        Log.v(TAG, "clearing speeds");
+        while(!mSpeeds.isEmpty()) {
+            DetectedSpeed spd = mSpeeds.remove(0);
+            for (DopplerListener listener : mSpeedListeners) {
+                listener.speedInvalidated(spd);
+            }
+        }
+
+        // Highest speed was reset too.
+        mHighestSpeed = new DetectedSpeed(0);
+        for (DopplerListener listener : mSpeedListeners) {
+            listener.highestSpeedChanged(mHighestSpeed);
+        }
+    }
+
+    /**
+     * Call to remove the specified speed from the active list.
+     * @param aSpeed
+     */
+    public void removeSpeed(DetectedSpeed aSpeed) {
+        if(mSpeeds.remove(aSpeed)) {
+            for (DopplerListener listener : mSpeedListeners) {
+                listener.speedInvalidated(aSpeed);
+            }
+        }
+
+        if(aSpeed == mHighestSpeed) {
+            DetectedSpeed mHighestSpeed = mSpeeds.get(0);
+            // Find new highest speed.
+            for(DetectedSpeed speed : mSpeeds) {
+                if(speed.getSpeed() > mHighestSpeed.getSpeed()) {
+                    mHighestSpeed = speed;
+                }
+            }
+
+            for (DopplerListener listener : mSpeedListeners) {
+                listener.highestSpeedChanged(mHighestSpeed);
+            }
+        }
+    }
+
+    /**
      * Implements Runnable.run() - should not be called externally.
      */
     @Override
@@ -165,7 +218,7 @@ public class DopplerController implements Runnable {
 
         // Start up the main loop.
         final long SPEED_REPORT_INTERVAL = 500;
-        long lastReportedSpeedTime = 0;
+        long speedDetectedTime = 0;
         double bestSpeed = 0;
         double bestSpeedWeight = 0;
         Log.v(TAG, "Entering main DopplerController processing loop.");
@@ -173,27 +226,37 @@ public class DopplerController implements Runnable {
             mDoppler.audioToBuffer(mMicHandler.readFrame(), mMicHandler.getRotatingPointer());
             mDoppler.nextFrame();
 
+            long currentTime = System.currentTimeMillis();
             if (mDoppler.numSpeeds() > 0) {
+                // Once a speed is detected, SPEED_REPORT_INTERVAL is waited to see if there are any more
+                // accurate speeds to use before reporting to UI.
+                if(bestSpeed == 0) {
+                    speedDetectedTime = currentTime;
+                }
                 for (int s = 0; s < mDoppler.numSpeeds(); s++) {
                     if (bestSpeedWeight < mDoppler.getSpeedWeight(s)) {
                         bestSpeed = mDoppler.getSpeed(s);
                         bestSpeedWeight = mDoppler.getSpeedWeight(s);
                     }
                 }
-
-                // Only report a new speed every SPEED_REPORT_INTERVAL ms, to prevent reporting the same pass multiple times.
-                long currentTime = System.currentTimeMillis();
-                if ((currentTime - lastReportedSpeedTime) > SPEED_REPORT_INTERVAL) {
-                    newSpeedDetected(bestSpeed);
-                    bestSpeed = 0.;
-                    bestSpeedWeight = 0.;
-                    lastReportedSpeedTime = currentTime;
-                }
             }
+
+            // If the interval has passed, report the speed and reset the state variables.
+            if (bestSpeed != 0 && (currentTime - speedDetectedTime) > SPEED_REPORT_INTERVAL) {
+                newSpeedDetected(bestSpeed);
+                bestSpeed = 0.;
+                bestSpeedWeight = 0.;
+            }
+
             try {
                 // Don't poll continuously. @todo - It might be best to write a waiting mechanism into AudioDoppler.
                 Thread.sleep(50);
             } catch (InterruptedException ie ) { }
+        }
+
+        mIsActive = false;
+        for (DopplerListener listener : mSpeedListeners) {
+            listener.dopplerActiveStateChanged(mIsActive);
         }
     }
 
@@ -203,16 +266,18 @@ public class DopplerController implements Runnable {
         }
     }
 
-    private void newSpeedDetected(double aSpeedInMps) {
+    private synchronized void newSpeedDetected(double aSpeedInMps) {
         Log.v(TAG, "New speed detected: " + aSpeedInMps);
 
+        DetectedSpeed speed = new DetectedSpeed(aSpeedInMps);
+        mSpeeds.add(speed);
         boolean newHighest = false;
-        if(aSpeedInMps > mHighestSpeed) {
-            mHighestSpeed = aSpeedInMps;
+        if(aSpeedInMps > mHighestSpeed.getSpeed()) {
+            mHighestSpeed = speed;
             newHighest = true;
         }
         for(DopplerListener listener : mSpeedListeners) {
-            listener.newSpeedDetected(aSpeedInMps);
+            listener.newSpeedDetected(speed);
             if(newHighest) {
                 listener.highestSpeedChanged(mHighestSpeed);
             }

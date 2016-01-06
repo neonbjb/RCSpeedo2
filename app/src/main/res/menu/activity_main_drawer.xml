@@ -7,6 +7,11 @@
             android:icon="@android:drawable/ic_menu_compass"
             android:title="@string/main_title" />
         <item
+            android:id="@+id/clear_speeds"
+            android:icon="@android:drawable/ic_menu_delete"
+            android:checkable="false"
+            android:title="@string/clear_speeds" />
+        <item
             android:id="@+id/log_manager_nav_button"
             android:icon="@android:drawable/ic_menu_agenda"
             android:title="@string/log_manager" />
@@ -17,6 +22,7 @@
         <item
             android:id="@+id/help_nav_button"
             android:icon="@android:drawable/ic_menu_help"
+            android:checkable="false"
             android:title="@string/help" />
     </group>
 

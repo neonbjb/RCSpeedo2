@@ -11,14 +11,24 @@ android:layout_height="wrap_content"
     android:layout_height="wrap_content"
     android:layout_alignParentLeft="true"
     android:layout_centerVertical="true"
-    android:textSize="24sp"
+    android:textSize="20sp"
     android:padding="5dp"
     android:text="No text"
 />
-<ImageView
-    android:id="@+id/bShare"
-	android:layout_width="wrap_content"
-	android:layout_height="wrap_content"
-	android:layout_alignParentRight="true"
-	android:padding="5dp" android:src="@drawable/share"></ImageView>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true">
+        <ImageView
+            android:id="@+id/bDeleteSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp" android:src="@android:drawable/ic_menu_delete"></ImageView>
+        <ImageView
+            android:id="@+id/bShare"
+            android:layout_marginLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="2dp" android:src="@android:drawable/ic_menu_share"></ImageView>
+    </LinearLayout>
 </RelativeLayout>

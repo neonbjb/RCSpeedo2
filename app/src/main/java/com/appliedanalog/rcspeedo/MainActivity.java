@@ -3,7 +3,6 @@ package com.appliedanalog.rcspeedo;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +16,7 @@ import android.view.WindowManager;
 
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
+import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
 import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
 import com.appliedanalog.rcspeedo.fragments.MainFragment;
@@ -41,13 +41,12 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabSaveLog);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Clearing speeds now", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                //@todo - Clear speeds.
+                // @todo - Save speeds to a new log on the selected model or prompt user to select a
+                //         model.
             }
         });
 
@@ -58,6 +57,8 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        // Set the default checked option to the first one.
+        navigationView.getMenu().getItem(0).setChecked(true);
         navigationView.setNavigationItemSelectedListener(this);
 
         // Initialize Strings localizer
@@ -102,9 +103,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void dopplerError(String aError) { }
             @Override
-            public void newSpeedDetected(double aSpeedInMps) { }
+            public void newSpeedDetected(DetectedSpeed aSpeedInMps) { }
             @Override
-            public void highestSpeedChanged(double aNewHighestSpeedMps) { }
+            public void highestSpeedChanged(DetectedSpeed aNewHighestSpeedMps) { }
+            @Override
+            public void speedInvalidated(DetectedSpeed aSpeed) { }
         });
     }
 
@@ -147,6 +150,8 @@ public class MainActivity extends AppCompatActivity
 
         if (id == R.id.main_screen_nav_button) {
             loadNewFragment(mainFragment, false);
+        } else if (id == R.id.clear_speeds) {
+            DopplerController.getInstance().clearSpeeds();
         } else if (id == R.id.log_manager_nav_button) {
             loadNewFragment(logFragment, true);
         } else if (id == R.id.settings_nav_button) {
