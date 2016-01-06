@@ -124,6 +124,15 @@ public class DopplerController implements Runnable {
             mThread = null;
         } catch (InterruptedException ie) {
         }
+        mMicHandler.stopRecording();
+    }
+
+    /**
+     * Should be called onDestroy to powerdown the controller and release any resources (e.g. Mic handle).
+     */
+    public void powerdown() {
+        stop();
+        mMicHandler.releaseRecorder();
     }
 
     /**
@@ -141,8 +150,11 @@ public class DopplerController implements Runnable {
     public void run() {
         // Verify the mic will work.
         if (!mMicHandler.startRecording()) {
+            Log.e(TAG, "Error initializing the Mic Handler");
             error(Strings.getInstance().ERR_NO_MIC);
             return;
+        } else {
+            Log.v(TAG, "Successfully acquired microphone.");
         }
 
         // Activate and notify.
@@ -156,24 +168,26 @@ public class DopplerController implements Runnable {
         long lastReportedSpeedTime = 0;
         double bestSpeed = 0;
         double bestSpeedWeight = 0;
+        Log.v(TAG, "Entering main DopplerController processing loop.");
         while (mIsActive) {
             mDoppler.audioToBuffer(mMicHandler.readFrame(), mMicHandler.getRotatingPointer());
             mDoppler.nextFrame();
 
             if (mDoppler.numSpeeds() > 0) {
+                for (int s = 0; s < mDoppler.numSpeeds(); s++) {
+                    if (bestSpeedWeight < mDoppler.getSpeedWeight(s)) {
+                        bestSpeed = mDoppler.getSpeed(s);
+                        bestSpeedWeight = mDoppler.getSpeedWeight(s);
+                    }
+                }
+
                 // Only report a new speed every SPEED_REPORT_INTERVAL ms, to prevent reporting the same pass multiple times.
                 long currentTime = System.currentTimeMillis();
                 if ((currentTime - lastReportedSpeedTime) > SPEED_REPORT_INTERVAL) {
+                    newSpeedDetected(bestSpeed);
                     bestSpeed = 0.;
                     bestSpeedWeight = 0.;
-                    newSpeedDetected(bestSpeed);
                     lastReportedSpeedTime = currentTime;
-                }
-                for (int s = 0; s < mDoppler.numSpeeds(); s++) {
-                    if (bestSpeedWeight < mDoppler.getSpeedWeight(s)) {
-                        bestSpeedWeight = mDoppler.getSpeedWeight(s);
-                        bestSpeed = mDoppler.getSpeed(s);
-                    }
                 }
             }
             try {
@@ -190,6 +204,8 @@ public class DopplerController implements Runnable {
     }
 
     private void newSpeedDetected(double aSpeedInMps) {
+        Log.v(TAG, "New speed detected: " + aSpeedInMps);
+
         boolean newHighest = false;
         if(aSpeedInMps > mHighestSpeed) {
             mHighestSpeed = aSpeedInMps;

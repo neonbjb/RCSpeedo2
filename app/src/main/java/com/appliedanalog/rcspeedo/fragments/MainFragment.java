@@ -1,31 +1,45 @@
 package com.appliedanalog.rcspeedo.fragments;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
+import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+
+import java.util.Locale;
 
 /**
  * Contains the main RCSpeedo interface as a fragment.
  */
-public class MainFragment extends Fragment implements DopplerController.DopplerListener {
+public class MainFragment extends Fragment implements DopplerController.DopplerListener, TextToSpeech.OnInitListener {
+    final String TAG = "MainFragment";
+
+    // UI Elements
     private TextView mSpeed;
     private TextView mHighestSpeed;
     private TextView mTemperature;
     private TextView mLoggingStatus;
     private Button mAction;
-    private Button mStartLogging;
     private ListView mSpeeds;
-    private ProgressBar mIsActive;
+
+    // Functional components.
+    private TextToSpeech mTts;
+    private boolean mTtsReady;
 
     /**
      * Default constructor.
@@ -42,6 +56,11 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        mTts = new TextToSpeech(getActivity().getApplicationContext(), this);
+        PowerManager powerManager = (PowerManager)getActivity().getSystemService(Context.POWER_SERVICE);
+
+        // Register for DopplerController updates.
+        DopplerController.getInstance().addSpeedListener(this);
     }
 
     @Override
@@ -55,14 +74,14 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
         mTemperature = (TextView)view.findViewById(R.id.tTemperature);
         mLoggingStatus = (TextView)view.findViewById(R.id.tLogInUse);
         mSpeeds = (ListView)view.findViewById(R.id.lSpeeds);
-        mIsActive = (ProgressBar)view.findViewById(R.id.pListening);
 
         mAction = (Button)view.findViewById(R.id.bStart);
-        mStartLogging = (Button)view.findViewById(R.id.bStartLogging);
         mAction.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(DopplerController.getInstance().isActive()) {
+                    Log.v(TAG, "Stopping the DopplerController..");
+
                     // Stop can sleep while waiting for the controller to terminate.
                     (new Thread("DopplerController Termination Waiter"){
                         public void run() {
@@ -70,6 +89,7 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                         }
                     }).start();
                 } else {
+                    Log.v(TAG, "Starting the DopplerController..");
                     DopplerController.getInstance().start();
                 }
             }
@@ -85,10 +105,8 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
             public void run() {
                 if(aIsActive) {
                     mAction.setText(Strings.getInstance().STOP_LISTENING);
-                    mIsActive.setVisibility(View.VISIBLE);
                 } else {
                     mAction.setText(Strings.getInstance().START_LISTENING);
-                    mIsActive.setVisibility(View.INVISIBLE);
                 }
             }
         });
@@ -96,24 +114,54 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
 
     @Override
     public void dopplerError(final String aError) {
-        //@todo - Implement
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                if(!aError.isEmpty()) {
+                    Toast toast = Toast.makeText(MainFragment.this.getContext(), aError, Toast.LENGTH_LONG);
+                    toast.show();
+                    // Show error in the logging status label too.
+                    mLoggingStatus.setText(aError);
+                }
+            }
+        });
     }
 
     @Override
     public void newSpeedDetected(final double aSpeedInMps) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                /*mSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aSpeedInMps));
-                if(mTtsReady && mPrefs.getBoolean(SettingsFragment.ENABLE_SOUND_KEY)) {
+                SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+                mSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aSpeedInMps));
+                if(mTtsReady && prefs.getBoolean(SettingsFragment.ENABLE_SOUND_KEY, true)) {
                     String term = UnitManager.getInstance().getVocalSpeed(aSpeedInMps);
+
+                    // Using the deprecated speak for backwards compatibility.
                     mTts.speak(term, TextToSpeech.QUEUE_FLUSH, null);
-                }*/
+                }
             }
         });
     }
 
     @Override
     public void highestSpeedChanged(final double aNewHighestSpeedMps) {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                mHighestSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aNewHighestSpeedMps));
+            }
+        });
+    }
 
+    // Event handlers for TextToSpeech.OnInitListener
+    @Override
+    public void onInit(int status) {
+        if(status == TextToSpeech.SUCCESS){
+            if(mTts.isLanguageAvailable(Locale.getDefault()) == TextToSpeech.LANG_MISSING_DATA){
+                Intent installTts = new Intent();
+                installTts.setAction(TextToSpeech.Engine.ACTION_INSTALL_TTS_DATA);
+                startActivity(installTts);
+            }
+            mTtsReady = true;
+            mTts.setLanguage(Locale.getDefault());
+        }
     }
 }

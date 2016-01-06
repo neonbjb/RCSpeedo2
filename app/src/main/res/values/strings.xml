@@ -11,7 +11,7 @@
     <string name="logging_status_startup">Not Logging</string>
     <string name="temperature_default">Temperature: 0F</string>
     <string name="start_listening">Start</string>
-    <string name="stop_listening">Stop Listening</string>
+    <string name="stop_listening">Stop</string>
     <string name="start_logging">Start Logging</string>
     <string name="stop_logging">Stop Logging</string>
     <string name="logging_to">Logging to:</string>

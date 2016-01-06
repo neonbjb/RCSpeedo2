@@ -11,7 +11,7 @@
     <string name="logging_status_startup">Não gravando</string>
     <string name="temperature_default">Temperatura: 0C</string>
     <string name="start_listening">Iniciar</string>
-    <string name="stop_listening">Parar de escuta</string>
+    <string name="stop_listening">Parar</string>
     <string name="start_logging">Iniciar gravação</string>
     <string name="stop_logging">Parar de gravação</string>
     <string name="logging_to">Gravação:</string>

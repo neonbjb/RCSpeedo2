@@ -11,7 +11,7 @@
     <string name="logging_status_startup">N’enregistre pas</string>
     <string name="temperature_default">Température: 0C</string>
     <string name="start_listening">Démarrer</string>
-    <string name="stop_listening">Arrêter l’écoute</string>
+    <string name="stop_listening">Arrêter</string>
     <string name="start_logging">Démarrer l’enreg</string>
     <string name="stop_logging">Arrêter l’enreg</string>
     <string name="logging_to">Enregistrement:</string>

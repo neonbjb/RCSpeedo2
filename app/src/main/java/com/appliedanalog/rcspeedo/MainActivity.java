@@ -13,7 +13,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
+import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
 import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -79,6 +82,37 @@ public class MainActivity extends AppCompatActivity
             mainFragment = new MainFragment();
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mainFragment).commit();
         }
+
+        // Keep the screen on when the DopplerController is active.
+        DopplerController.getInstance().addSpeedListener(new DopplerController.DopplerListener() {
+            @Override
+            public void dopplerActiveStateChanged(final boolean aIsActive) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(aIsActive) {
+                            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        } else {
+                            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void dopplerError(String aError) { }
+            @Override
+            public void newSpeedDetected(double aSpeedInMps) { }
+            @Override
+            public void highestSpeedChanged(double aNewHighestSpeedMps) { }
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        DopplerController.getInstance().powerdown();
     }
 
     @Override
