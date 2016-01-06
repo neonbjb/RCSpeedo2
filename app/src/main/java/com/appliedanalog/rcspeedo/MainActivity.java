@@ -7,6 +7,8 @@
 
 package com.appliedanalog.rcspeedo;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -164,7 +166,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.settings_nav_button) {
             loadNewFragment(settingsFragment, true);
         } else if (id == R.id.help_nav_button) {
-
+            // Simply bring up the manual on the website.
+            Intent browserIntent = new Intent("android.intent.action.VIEW", Uri.parse("http://www.rcspeedo.com/guide/manual/"));
+            startActivity(browserIntent);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
