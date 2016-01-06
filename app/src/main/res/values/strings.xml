@@ -62,10 +62,10 @@
     <string name="change_units_of_speed_desc">Switch between MPH and Km/h.</string>
     <string name="change_temperature_unit">Change Temperature Unit</string>
     <string name="change_temperature_unit_desc">Switch between C and F.</string>
-    <string name="enable_gps">Enable GPS</string>
+    <string name="enable_gps">Enable GPS Temperature</string>
     <string name="enable_gps_desc">Use the device\'s GPS to detect local temperature.</string>
-    <string name="temperature">Temperature</string>
-    <string name="temperature_desc">Manually set the temperature (will disable GPS).</string>
+    <string name="temperature">Outside Temperature</string>
+    <string name="temperature_desc">Set the temperature here if GPS is disabled or weather info is unavailable.</string>
 
     <!-- Error messages -->
     <string name="err_no_mic">Could not use the microphone on your phone. Close app and relaunch to try again.</string>

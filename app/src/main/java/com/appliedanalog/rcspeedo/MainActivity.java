@@ -21,6 +21,9 @@ import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
 import com.appliedanalog.rcspeedo.fragments.MainFragment;
 import com.appliedanalog.rcspeedo.fragments.SettingsFragment;
 
+/**
+ * Main activity of RCSpeedo.
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnFragmentInteractionListener {
 
@@ -55,11 +58,15 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //Initialize Strings localizer
+        // Initialize Strings localizer
         Strings.init(getResources());
 
-        //initialize the unit manager
+        // Initialize the unit manager
         UnitManager.getInstance().init(this);
+
+        // Initialize the background fragments.
+        settingsFragment = new SettingsFragment();
+        logFragment = new LogManagerFragment();
 
         // Populate the fragment container.
         if (findViewById(R.id.fragment_container) != null) {
@@ -71,7 +78,6 @@ public class MainActivity extends AppCompatActivity
             }
 
             mainFragment = new MainFragment();
-            mainFragment.setArguments(getIntent().getExtras());
             getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mainFragment).commit();
         }
     }
