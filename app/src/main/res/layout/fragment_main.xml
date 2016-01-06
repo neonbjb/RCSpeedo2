@@ -4,10 +4,78 @@
     android:layout_height="match_parent"
     tools:context="com.appliedanalog.rcspeedo.fragments.MainFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+    <RelativeLayout
+        android:id="@+id/widget41"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        >
+        <Button
+            android:id="@+id/bStart"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_width="110dp"
+            android:layout_height="80dp"
+            android:text="@string/start_listening"
+            android:textSize="20dp"
+            android:layout_margin="10dp"
+            >
+        </Button>
+        <TextView
+            android:id="@+id/tSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/speed_default"
+            android:textSize="40dp"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5px"
+            >
+        </TextView>
+        <TextView
+            android:id="@+id/tHighestSpeed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/highest_default"
+            android:textSize="15dp"
+            android:layout_below="@+id/tSpeed"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5px"
+            >
+        </TextView>
+        <TextView
+            android:id="@+id/tTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/temperature_default"
+            android:textSize="15dp"
+            android:layout_below="@+id/tHighestSpeed"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5px"
+            >
+        </TextView>
+        <TextView
+            android:id="@+id/tLogInUse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/logging_status_startup"
+            android:textSize="15dp"
+            android:layout_below="@+id/tTemperature"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="5px"
+            android:textColor="#ffff0000"
+            >
+        </TextView>
+        <ListView
+            android:id="@+id/lSpeeds"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@+id/tLogInUse"
+            android:paddingBottom="60dp"
+            android:layout_alignParentLeft="true"
+            >
+        </ListView>
+    </RelativeLayout>
 
 </FrameLayout>

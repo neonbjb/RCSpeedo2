@@ -10,7 +10,7 @@
     <string name="highest_speed">Höchstgeschwindigkeit:</string>
     <string name="logging_status_startup">Zeichnet nicht auf</string>
     <string name="temperature_default">Temperatur: 0C</string>
-    <string name="start_listening">Starte Hörvorgang</string>
+    <string name="start_listening">Starte</string>
     <string name="stop_listening">Stoppen</string>
     <string name="start_logging">Starte Aufzeichnung</string>
     <string name="stop_logging">Stoppen Aufzeichnung</string>

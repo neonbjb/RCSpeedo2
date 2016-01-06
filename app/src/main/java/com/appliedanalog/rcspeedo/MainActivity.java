@@ -1,6 +1,5 @@
 package com.appliedanalog.rcspeedo;
 
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -25,7 +24,7 @@ import com.appliedanalog.rcspeedo.fragments.SettingsFragment;
  * Main activity of RCSpeedo.
  */
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MainFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     // Fragments which can be swapped in and out on request
     MainFragment mainFragment;
@@ -127,8 +126,4 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-
-    }
 }
