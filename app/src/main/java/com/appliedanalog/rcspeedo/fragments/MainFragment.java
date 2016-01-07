@@ -10,8 +10,10 @@ package com.appliedanalog.rcspeedo.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PowerManager;
+import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -26,16 +28,21 @@ import android.widget.Toast;
 import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
+import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
 import com.appliedanalog.rcspeedo.views.SpeedViewAdapter;
 
 import java.util.Locale;
 
+import static com.appliedanalog.rcspeedo.controllers.SettingsKeys.ENABLE_SOUND_KEY;
+
 /**
  * Contains the main RCSpeedo interface as a fragment.
  */
-public class MainFragment extends Fragment implements DopplerController.DopplerListener, TextToSpeech.OnInitListener {
+public class MainFragment extends Fragment implements DopplerController.DopplerListener,
+                                                      WeatherController.TemperatureListener,
+                                                      TextToSpeech.OnInitListener {
     final String TAG = "MainFragment";
 
     // UI Elements
@@ -71,6 +78,9 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
 
         // Register for DopplerController updates.
         DopplerController.getInstance().addSpeedListener(this);
+
+        // Register for temperature updates.
+        WeatherController.getInstance().addListener(this);
     }
 
     @Override
@@ -108,6 +118,9 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
         mSpeedsAdapter = new SpeedViewAdapter(getActivity());
         mSpeeds.setAdapter(mSpeedsAdapter);
 
+        // Initialize temperature.
+        temperatureChanged(WeatherController.getInstance().getLastTemperature(), WeatherController.getInstance().isTemperatureDerivedFromLocation());
+
         return view;
     }
 
@@ -143,10 +156,10 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
     public void newSpeedDetected(final DetectedSpeed aSpeedInMps) {
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
-                SharedPreferences prefs = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
                 mSpeed.setText(UnitManager.getInstance().getDisplaySpeed(aSpeedInMps.getSpeed()));
                 mSpeedsAdapter.add(aSpeedInMps);
-                if(mTtsReady && prefs.getBoolean(SettingsFragment.ENABLE_SOUND_KEY, true)) {
+                if(mTtsReady && prefs.getBoolean(ENABLE_SOUND_KEY, true)) {
                     String term = UnitManager.getInstance().getVocalSpeed(aSpeedInMps.getSpeed());
 
                     // Using the deprecated speak for backwards compatibility.
@@ -168,7 +181,6 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
 
     @Override
     public void speedInvalidated(final DetectedSpeed aSpeed) {
-        //@todo - Remove from list.
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 mSpeedsAdapter.remove(aSpeed);
@@ -188,5 +200,20 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
             mTtsReady = true;
             mTts.setLanguage(Locale.getDefault());
         }
+    }
+
+    // Event handlers for WeatherController.
+    @Override
+    public void temperatureChanged(final int aNewTemp, final boolean aTemperatureWasAutomaticallySet) {
+        getActivity().runOnUiThread(new Runnable() {
+            public void run() {
+                mTemperature.setText(Strings.getInstance().TEMPERATURE_IND + UnitManager.getInstance().getTemperature(aNewTemp));
+                if(aTemperatureWasAutomaticallySet) {
+                    mTemperature.setTextColor(Color.parseColor("#003300"));
+                } else {
+                    mTemperature.setTextColor(Color.parseColor("#000066"));
+                }
+            }
+        });
     }
 }

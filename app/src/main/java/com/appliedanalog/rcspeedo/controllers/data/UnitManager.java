@@ -14,8 +14,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.appliedanalog.rcspeedo.R;
+import com.appliedanalog.rcspeedo.controllers.SettingsKeys;
 import com.appliedanalog.rcspeedo.controllers.Strings;
-import com.appliedanalog.rcspeedo.fragments.SettingsFragment;
 
 public class UnitManager {
 	final String TAG = "UnitManager";
@@ -66,14 +66,14 @@ public class UnitManager {
 	
 	public void loadFromPreferences(SharedPreferences prefs){
 		int ttind, stind;
-		String tname = prefs.getString(SettingsFragment.TEMP_UNIT_KEY, null);
+		String tname = prefs.getString(SettingsKeys.TEMP_UNIT_KEY, null);
 		if(tname == null){
 			ttind = 0;
 		}else{
 			ttind = getTempTypeIndex(tname);
 		}
 		currentTempType = TempTypes[ttind];
-		tname = prefs.getString(SettingsFragment.SPEED_UNIT_KEY, null);
+		tname = prefs.getString(SettingsKeys.SPEED_UNIT_KEY, null);
 		if(tname == null){
 			stind = 0;
 		}else{
@@ -135,7 +135,7 @@ public class UnitManager {
 		Log.v(TAG, "SetTempType: " + currentTempType.name);
 		if(context != null){
 			SharedPreferences.Editor ed = PreferenceManager.getDefaultSharedPreferences(context).edit();
-			ed.putString(SettingsFragment.TEMP_UNIT_KEY, TempTypes[ttind].name);
+			ed.putString(SettingsKeys.TEMP_UNIT_KEY, TempTypes[ttind].name);
 			ed.commit();
 		}
 	}
@@ -148,7 +148,7 @@ public class UnitManager {
 		currentSpeedType = SpeedTypes[stind];
 		if(context != null){
 			SharedPreferences.Editor ed = PreferenceManager.getDefaultSharedPreferences(context).edit();
-			ed.putString(SettingsFragment.SPEED_UNIT_KEY, SpeedTypes[stind].name);
+			ed.putString(SettingsKeys.SPEED_UNIT_KEY, SpeedTypes[stind].name);
 			ed.commit();
 		}
 	}

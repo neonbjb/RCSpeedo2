@@ -98,6 +98,15 @@ public class DopplerController implements Runnable {
         mIsActive = false;
         mSpeeds = new ArrayList<DetectedSpeed>();
         mHighestSpeed = new DetectedSpeed(0);
+        mDoppler.setTemperature(WeatherController.getInstance().getLastTemperature());
+
+        // Register for updates to the temperature.
+        WeatherController.getInstance().addListener(new WeatherController.TemperatureListener() {
+            @Override
+            public void temperatureChanged(int aNewTemp, boolean aTemperatureWasAutomaticallySet) {
+                mDoppler.setTemperature(aNewTemp);
+            }
+        });
     }
 
     /**

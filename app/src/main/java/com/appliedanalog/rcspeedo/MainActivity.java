@@ -7,9 +7,12 @@
 
 package com.appliedanalog.rcspeedo;
 
+import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -25,6 +28,7 @@ import android.view.WindowManager;
 
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
+import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
 import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
@@ -75,6 +79,10 @@ public class MainActivity extends AppCompatActivity
 
         // Initialize the unit manager
         UnitManager.getInstance().init(this);
+
+        // Initialize the WeatherController
+        WeatherController.getInstance().init((LocationManager)getSystemService(Context.LOCATION_SERVICE),
+                                                PreferenceManager.getDefaultSharedPreferences(this));
 
         // Initialize the background fragments.
         settingsFragment = new SettingsFragment();
