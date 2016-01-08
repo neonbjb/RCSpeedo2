@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +28,7 @@ import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.logs.EmptyLogEntry;
 import com.appliedanalog.rcspeedo.logs.LoggingDatabase;
-import com.appliedanalog.rcspeedo.logs.RCLog;
+import com.appliedanalog.rcspeedo.logs.ModelLog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -40,6 +41,8 @@ import java.util.Iterator;
  * models.
  */
 public class LogManagerFragment extends Fragment {
+    final String TAG = "LogManagerFragment";
+
     private Spinner mAvailableLogs;
     private Button mCreateModel;
     private Button mDeleteModel;
@@ -47,9 +50,14 @@ public class LogManagerFragment extends Fragment {
     private Strings mStrings;
 
     private ArrayAdapter<String> mLogs;
-    private HashMap<String, RCLog> mLogMap = new HashMap<String, RCLog>();
+    private HashMap<String, ModelLog> mLogMap = new HashMap<String, ModelLog>();
 
     SimpleDateFormat mDateFormat; //this is used as a default log date
+
+    //These two state variables are to handle issues with adding items to the list - when you do this
+    //a bunch of listSelected() events will be thrown which will turn off logging. These help prevent this.
+    boolean mIsInitializing = false;
+    boolean mFirstSelect = false;
 
     /**
      * Called when the activity is first created.
@@ -92,7 +100,7 @@ public class LogManagerFragment extends Fragment {
 
         mDeleteModel.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            final RCLog clog = getSelectedLog();
+            final ModelLog clog = getSelectedLog();
             if (clog == null) {
                 alert(mStrings.ERR_NO_LOG_SELECTED);
                 return;
@@ -104,13 +112,9 @@ public class LogManagerFragment extends Fragment {
                 .setMessage(mStrings.CNFRM_BODY)
                 .setPositiveButton(mStrings.camel(mStrings.YES), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        LoggingDatabase ldb = LoggingDatabase.getData(getActivity().getApplicationContext());
-                        ldb.deleteLog(clog.getName());
+                        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+                        ldb.deleteModelLog(clog.getName());
                         mLogs.remove(clog.getName());
-                        if (RCLog.isLogging() && RCLog.getCurrentLog().getName().equals(clog)) {
-                            stopLogging();
-                            RCLog.setCurrentLog(null);
-                        }
                     }
                 })
                 .setNegativeButton(mStrings.camel(mStrings.NO), null)
@@ -120,7 +124,7 @@ public class LogManagerFragment extends Fragment {
 
         mEmailLog.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-            RCLog clog = getSelectedLog();
+            ModelLog clog = getSelectedLog();
             if (clog == null) {
                 alert(mStrings.ERR_NO_LOG_SELECTED);
                 return;
@@ -134,82 +138,44 @@ public class LogManagerFragment extends Fragment {
             emailIntent.setType("text/csv");
             emailIntent.putExtra(Intent.EXTRA_SUBJECT, "RCSpeedo logs for model: " + clog.getName());
             emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file://" + tlogfile.getAbsolutePath()));
-            System.out.println("Extra stream: " + "file://" + tlogfile.getAbsolutePath());
+            Log.v(TAG, "Extra stream: " + "file://" + tlogfile.getAbsolutePath());
             startActivity(Intent.createChooser(emailIntent, "Send mail.."));
             }
         });
 
         mAvailableLogs.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-                if (is_initializing) return;
-                if (first_select) {
-                    first_select = false;
+                if (mIsInitializing) return;
+                if (mFirstSelect) {
+                    mFirstSelect = false;
                     return;
                 }
-                System.out.println("Item selected");
-                LoggingDatabase ldb = LoggingDatabase.getData(getActivity().getApplicationContext());
-                RCLog log = ldb.getLog((String) mAvailableLogs.getSelectedItem());
-                stopLogging();
-                RCLog.setCurrentLog(log);
+                Log.v(TAG, "Item selected");
+                LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+                ModelLog log = ldb.getModelLog((String) mAvailableLogs.getSelectedItem());
                 setSelectedLog(log);
             }
 
             public void onNothingSelected(AdapterView<?> arg0) {
-                if (is_initializing) return;
-                if (first_select) {
-                    first_select = false;
+                if (mIsInitializing) return;
+                if (mFirstSelect) {
+                    mFirstSelect = false;
                     return;
                 }
-                stopLogging();
             }
         });
 
         return view;
     }
 
-    private void setSelectedLog(RCLog log) {
-        int nentries = log.getNumberEntries() - 1;
-        if (nentries < 0) {
-            nentries = 0;
-        }
-    }
-
-    protected void createLogCompleted(String model) {
-        stopLogging();
-        if (model.trim().length() == 0) {
-            alert(mStrings.ERR_NAME_REQUIRED);
-            model = mStrings.LOG_DEFAULT_MODEL_NAME;
-        }
-        //insert it into the database
-        LoggingDatabase ldb = LoggingDatabase.getData(getActivity().getApplicationContext());
-        if (ldb.getLog(model) != null) {
-            alert(mStrings.ERR_LOG_EXISTS);
-            return;
-        }
-        RCLog log = new RCLog(model);
-        ldb.addLogEntry(new EmptyLogEntry(), log); //An empty entry will ensure this log shows up in the list of available logs.
-        //add it to the list of logs
-        mLogs.add(model);
-        mLogMap.put(model, log);
-        //select it (make sure selectLog() is called)
-        mAvailableLogs.setSelection(mLogs.getCount() - 1);
-        RCLog.setCurrentLog(log);
-        setSelectedLog(log);
-    }
-
-    //These two state variables are to handle issues with adding items to the list - when you do this
-    //a bunch of listSelected() events will be thrown which will turn off logging. These help prevent this.
-    boolean is_initializing = false;
-    boolean first_select = false;
-
     @Override
     public void onStart() {
         super.onStart();
 
-        is_initializing = true;
-        LoggingDatabase ldb = LoggingDatabase.getData(getActivity().getApplicationContext());
-        Collection<RCLog> alllogs = ldb.getAllLogs();
-        Iterator<RCLog> iter = alllogs.iterator();
+        mIsInitializing = true;
+        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+        Collection<ModelLog> alllogs = ldb.getAllModels();
+        Iterator<ModelLog> iter = alllogs.iterator();
 
         //refresh the logs in that folder
         mLogs.clear();
@@ -217,49 +183,13 @@ public class LogManagerFragment extends Fragment {
         int possel = -1;
         int pos = 0;
         while (iter.hasNext()) {
-            RCLog next = iter.next();
+            ModelLog next = iter.next();
             mLogs.add(next.getName());
             mLogMap.put(next.getName(), next);
-            if (RCLog.isLogging() && RCLog.getCurrentLog().getName().equals(next.getName())) {
-                possel = pos;
-                boolean wasLogging = RCLog.isLogging();
-                RCLog.setCurrentLog(next); //It might have more recent data, why not?
-                if (wasLogging) {
-                    RCLog.startLogging();
-                } else {
-                    RCLog.stopLogging();
-                }
-            }
             pos++;
         }
-        is_initializing = false;
-        first_select = true;
-
-        if (RCLog.isLogging()) {
-            setSelectedLog(RCLog.getCurrentLog());
-            if (possel == -1) {
-                System.out.println("Critical Error! Could not find current log in the list of available logs!");
-            } else {
-                mAvailableLogs.setSelection(possel);
-            }
-        } else {
-            stopLogging();
-            if (alllogs.size() > 0) {
-                setSelectedLog(alllogs.iterator().next());
-            }
-        }
-    }
-
-    RCLog getSelectedLog() {
-        if (mAvailableLogs.getSelectedItem() == null) {
-            return null;
-        }
-        return mLogMap.get(mAvailableLogs.getSelectedItem());
-    }
-
-    void stopLogging() {
-        System.out.println(mStrings.STOP_LISTENING);
-        RCLog.stopLogging();
+        mIsInitializing = false;
+        mFirstSelect = true;
     }
 
     @Override
@@ -272,15 +202,50 @@ public class LogManagerFragment extends Fragment {
         super.onDestroy();
     }
 
-    String _alert_text; //vulnerable to threading..
+
+    protected void createLogCompleted(String model) {
+        if (model.trim().length() == 0) {
+            alert(mStrings.ERR_NAME_REQUIRED);
+            model = mStrings.LOG_DEFAULT_MODEL_NAME;
+        }
+        //insert it into the database
+        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+        if (ldb.getModelLog(model) != null) {
+            alert(mStrings.ERR_LOG_EXISTS);
+            return;
+        }
+        ModelLog log = new ModelLog(model);
+        ldb.addLogEntry(new EmptyLogEntry(), log); //An empty entry will ensure this log shows up in the list of available logs.
+        //add it to the list of logs
+        mLogs.add(model);
+        mLogMap.put(model, log);
+        //select it (make sure selectLog() is called)
+        mAvailableLogs.setSelection(mLogs.getCount() - 1);
+        setSelectedLog(log);
+    }
+
+    private void setSelectedLog(ModelLog log) {
+        // @todo - Add any logic necessary when a log is selected by the user.
+    }
+
+    private ModelLog getSelectedLog() {
+        if (mAvailableLogs.getSelectedItem() == null) {
+            return null;
+        }
+        return mLogMap.get(mAvailableLogs.getSelectedItem());
+    }
+
+    // Simple dialog generation code.
+    //@todo - Update this to use the modern Android dialog paradigm.
+    String mAlertText;
 
     void alert(String msg) {
-        _alert_text = msg;
+        mAlertText = msg;
         getActivity().showDialog(DIALOG_ALERT);
     }
 
     void alertCritical(String msg) {
-        _alert_text = msg;
+        mAlertText = msg;
         getActivity().showDialog(DIALOG_ALERT_CRITICAL);
     }
 
@@ -292,7 +257,7 @@ public class LogManagerFragment extends Fragment {
         switch (id) {
             case DIALOG_ALERT:
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(_alert_text)
+                builder.setMessage(mAlertText)
                         .setPositiveButton(mStrings.OK, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                             }
@@ -301,7 +266,7 @@ public class LogManagerFragment extends Fragment {
                 break;
             case DIALOG_ALERT_CRITICAL:
                 builder = new AlertDialog.Builder(getActivity());
-                builder.setMessage(_alert_text)
+                builder.setMessage(mAlertText)
                         .setPositiveButton(mStrings.OK, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 //@todo - Switch fragment to main view.

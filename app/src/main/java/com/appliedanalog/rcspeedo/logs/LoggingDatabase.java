@@ -15,55 +15,70 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * Controller class that manages interaction with the SQLite database to persist logging data.
+ */
 public class LoggingDatabase extends SQLiteOpenHelper{
-	private static final String TBL = "logs";	
-	private static final String INSERT_FIELDS = "(log,model,type,date,main,ext1,ext2,ext3)";
+	private static final String TBL = "logsv2";
+	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
 	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
-									"log text, model text, type integer, date text, main text, ext1 text, ext2 text, ext3 text);";
+									"model varchar(100), loggroup varchar(100), type integer, date text, main text, ext1 text, ext2 text, ext3 text);";
 	
-	static LoggingDatabase singleton = null;
-	public static LoggingDatabase getData(Context context){
-		if(singleton == null){
-			singleton = new LoggingDatabase(context);
+	static LoggingDatabase sInstance = null;
+
+    /**
+     * Fetches the Singleton instance.
+     * @param context Activity context.
+     * @return
+     */
+	public static LoggingDatabase getInstance(Context aContext){
+		if(sInstance == null){
+			sInstance = new LoggingDatabase(aContext);
 		}
-		return singleton;
+		return sInstance;
 	}
 	
-	private LoggingDatabase(Context context){
-		super(context, TBL, null, 2);
-	}
-	
-	@Override
-	public void onCreate(SQLiteDatabase db){
-		db.execSQL(APP_TABLE_CREATE);
+	private LoggingDatabase(Context aContext){
+		super(aContext, TBL, null, 2);
 	}
 
-	public void addLogEntry(LogEntry entry, RCLog log){
-		getWritableDatabase().execSQL("insert into " + TBL + " " + INSERT_FIELDS + " values ('" + log.getName() + 
-				"', '" + log.getName() + "', '" + entry.getType() + "', '" + entry.getDateTime() + "', '" + entry.getMain() +
-				"', '" + entry.getExt1() + "', '" + entry.getExt2() + "', '" + entry.getExt3() + "');");
+    /**
+     * Add an entry to the specified ModelLog. This entry will persist after this method is called.
+     * @param aEntry
+     * @param aLog
+     */
+	public void addLogEntry(LogEntry aEntry, ModelLog aLog){
+		getWritableDatabase().execSQL("insert into " + TBL + " " + INSERT_FIELDS + " values ('" + aLog.getName() +
+                "', '" + aEntry.getLogGroup() + "', '" + aEntry.getType() + "', '" + aEntry.getDateTime() + "', '" + aEntry.getMain() +
+                "', '" + aEntry.getExt1() + "', '" + aEntry.getExt2() + "', '" + aEntry.getExt3() + "');");
 	}
-	
-	public void deleteLog(String lname){
-		getWritableDatabase().execSQL("delete from " + TBL + " where log='" + lname + "';");
+
+    /**
+     * Deletes all entries correspnoding to the specified model.
+     * @param aModel
+     */
+	public void deleteModelLog(String aModel){
+		getWritableDatabase().execSQL("delete from " + TBL + " where model='" + aModel + "';");
 	}
-	
-	public Collection<RCLog> getAllLogs(){
-		HashMap<String, RCLog> logs = new HashMap<String, RCLog>();
+
+    /**
+     * Retrieve a collection of all the available models and their respective entries.
+     * @return
+     */
+	public Collection<ModelLog> getAllModels(){
+		HashMap<String, ModelLog> logs = new HashMap<String, ModelLog>();
 		Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + ";", null);
 		if(!curs.moveToFirst()) return logs.values();
 		do{
-			int id = curs.getInt(0);
 			String name = curs.getString(1);
-			String model = curs.getString(2);
 			double spd = curs.getDouble(4);
 			if(!logs.containsKey(name)){
-				logs.put(name, new RCLog(name, id));
+				logs.put(name, new ModelLog(name));
 			}
 			if(spd == -1.) continue; //this is just a stub
-			RCLog log = logs.get(name);
+			ModelLog log = logs.get(name);
 			try{
-				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(4), 
+				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(2), curs.getString(4),
 														curs.getString(5), curs.getString(6),
 									      				curs.getString(7), curs.getString(8)));
 			}catch(Exception e){
@@ -74,18 +89,23 @@ public class LoggingDatabase extends SQLiteOpenHelper{
 		curs.close();
 		return logs.values();
 	}
-	
-	public RCLog getLog(String logname){
-		Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + " where log='" + logname + "';", null);
-		RCLog log = null;
+
+    /**
+     * Gets the specified Model, filled with its log entries.
+     * @param aModel
+     * @return
+     */
+	public ModelLog getModelLog(String aModel){
+		Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + " where model='" + aModel + "';", null);
+		ModelLog log = null;
 		if(!curs.moveToFirst()) return null;
 		do{
 			if(log == null){
-				log = new RCLog(curs.getString(1), curs.getInt(0));
+				log = new ModelLog(curs.getString(1));
 			}
 			try{
 				log.addEntry(
-						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(4), 
+						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(2), curs.getString(4),
 												   curs.getString(5), curs.getString(6),
 								      			   curs.getString(7), curs.getString(8)));
 			}catch(Exception e){
@@ -96,9 +116,16 @@ public class LoggingDatabase extends SQLiteOpenHelper{
 		curs.close();
 		return log;
 	}
+
+    // Interface methods for SQLiteOpenHelper.
+
+    @Override
+    public void onCreate(SQLiteDatabase aDb){
+        aDb.execSQL(APP_TABLE_CREATE);
+    }
 	
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+	public void onUpgrade(SQLiteDatabase aDb, int oldVersion, int newVersion) {
 		//called when alter table is needed, will be implemented if/when it is needed
 	}
 }

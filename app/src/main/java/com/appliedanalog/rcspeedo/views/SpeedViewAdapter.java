@@ -22,7 +22,6 @@ import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
-import com.appliedanalog.rcspeedo.logs.RCLog;
 
 import java.util.ArrayList;
 
@@ -70,13 +69,7 @@ public class SpeedViewAdapter extends ArrayAdapter<DetectedSpeed>{
             public void onClick(View v) {
                 Strings s = Strings.getInstance();
 
-                //Get model name if possible
                 String pretext = s.MAIL_SPEED_PRETEXT_NO_MODEL;
-                RCLog rcl = RCLog.getCurrentLog();
-                if (rcl != null) {
-                    pretext = s.MAIL_SPEED_PRETEXT_1 + rcl.getName() + s.MAIL_SPEED_PRETEXT_2;
-                }
-
                 Intent i = new Intent(android.content.Intent.ACTION_SEND);
                 i.setType("text/plain");
                 i.putExtra(Intent.EXTRA_SUBJECT, s.MAIL_SPEED_SUBJECT);
