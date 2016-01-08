@@ -74,7 +74,7 @@ public class SpeedViewAdapter extends ArrayAdapter<DetectedSpeed>{
                 String pretext = s.MAIL_SPEED_PRETEXT_NO_MODEL;
                 RCLog rcl = RCLog.getCurrentLog();
                 if (rcl != null) {
-                    pretext = s.MAIL_SPEED_PRETEXT_1 + rcl.getModel() + s.MAIL_SPEED_PRETEXT_2;
+                    pretext = s.MAIL_SPEED_PRETEXT_1 + rcl.getName() + s.MAIL_SPEED_PRETEXT_2;
                 }
 
                 Intent i = new Intent(android.content.Intent.ACTION_SEND);

@@ -16,17 +16,15 @@ import java.util.Iterator;
 public class RCLog {
 	ArrayList<LogEntry> entries = new ArrayList<LogEntry>();
 	boolean filled;
-	String logname;
 	String modelname;
 	int id = -1; //optional
 	
-	public RCLog(String logname, String modelname, int id){
-		this(logname, modelname);
+	public RCLog(String modelname, int id){
+		this(modelname);
 		this.id = id;
 	}
 	
-	public RCLog(String logname, String modelname){
-		this.logname = logname;
+	public RCLog(String modelname){
 		this.modelname = modelname;
 		filled = false;
 	}
@@ -49,12 +47,8 @@ public class RCLog {
 		return entries.iterator();
 	}
 	
-	public String getModel(){
-		return modelname;
-	}
-	
 	public String getName(){
-		return logname;
+		return modelname;
 	}
 	
 	public boolean fromDatabase(){
@@ -84,7 +78,7 @@ public class RCLog {
 			File realfile = new File(RCSPEEDO_TEMP_DIR + f.getName());
 			PrintWriter pw = new PrintWriter(new FileWriter(realfile));
 			//print out the header
-			pw.println(logname + "," + modelname + "\n");
+			pw.println(modelname + "\n");
 			Iterator<LogEntry> iter = entries.iterator();
 			String logdate = null;
 			while(iter.hasNext()){

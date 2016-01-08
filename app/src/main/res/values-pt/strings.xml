@@ -25,8 +25,7 @@
     <!--  Logging Dialog-->
     <string name="logging">Registrando</string>
     <string name="log_title">Gestor de gravações</string>
-    <string name="log_colon">Gravação: </string>
-    <string name="model_name">Nome do modelo:</string>
+    <string name="log_colon">Modelo: </string>
     <string name="log_name">Nome da gravação:</string>
     <string name="status">Status: </string>
     <string name="default_status">Não gravando</string>

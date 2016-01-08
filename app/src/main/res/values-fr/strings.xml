@@ -25,8 +25,7 @@
     <!--  Logging Dialog-->
     <string name="logging">Enregistrement en cours</string>
     <string name="log_title">Gestionnaire d’enregistrements</string>
-    <string name="log_colon">Enregistrement: </string>
-    <string name="model_name">Nom du modèle:</string>
+    <string name="log_colon">Modèle: </string>
     <string name="log_name">Nom d’enregistrement:</string>
     <string name="status">État: </string>
     <string name="default_status">N’enregistre pas</string>

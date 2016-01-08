@@ -25,29 +25,10 @@
     			  android:layout_height="wrap_content"
     			  android:hint="@string/log_name_hint"></EditText>
     </RelativeLayout>
-    <RelativeLayout
-    	  android:id="@+id/rlEnterModel"
-		  android:orientation="horizontal"
-    	  android:layout_alignParentLeft="true"
-    	  android:layout_below="@id/rlEnterName"
-		  android:layout_width="fill_parent"
-		  android:layout_height="wrap_content">
-    	<TextView android:id="@+id/lCreateLogModelDlg"
-    		      android:text="@string/model_name"
-    		      android:layout_centerVertical="true"
-    		      android:paddingRight="10px"
-    			  android:layout_width="wrap_content"
-    			  android:layout_height="wrap_content"></TextView>
-    	<EditText android:id="@+id/tCreateLogModelDlg"
-    			  android:layout_toRightOf="@id/lCreateLogModelDlg"
-    			  android:layout_width="fill_parent"
-    			  android:layout_height="wrap_content"
-    			  android:hint="@string/model_name_hint"></EditText>
-    </RelativeLayout>
     <Button
     	android:id="@+id/bCreateLogDlg"
     	android:layout_alignParentLeft="true"
-    	android:layout_below="@id/rlEnterModel"
+    	android:layout_below="@id/rlEnterName"
     	android:layout_width="fill_parent"
     	android:layout_height="wrap_content"
     	android:text="@string/create_log"></Button>

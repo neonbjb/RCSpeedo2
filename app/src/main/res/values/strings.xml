@@ -28,15 +28,14 @@
     <!--  Logging Dialog-->
     <string name="logging">Logging</string>
     <string name="log_title">Log Manager</string>
-    <string name="log_colon">Log: </string>
-    <string name="model_name">Model Name:</string>
+    <string name="log_colon">Model: </string>
     <string name="log_name">Log Name:</string>
     <string name="status">Status: </string>
     <string name="default_status">Not Logging</string>
-    <string name="number_entries">Number of Entries: </string>
-    <string name="create_new_log">Create New Log</string>
-    <string name="delete_log">Delete Log</string>
-    <string name="email_log">Email Selected Log</string>
+    <string name="number_entries">Number of Saved Logs: </string>
+    <string name="create_new_log">Create New Model</string>
+    <string name="delete_log">Delete Model</string>
+    <string name="email_log">Email Logs for Selected Model</string>
     <string name="none">None</string>
     <string name="airplane">Airplane</string>
     <string name="pick_log">Pick a Log to Use</string>

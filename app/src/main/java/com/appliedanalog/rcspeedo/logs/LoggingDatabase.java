@@ -40,7 +40,7 @@ public class LoggingDatabase extends SQLiteOpenHelper{
 
 	public void addLogEntry(LogEntry entry, RCLog log){
 		getWritableDatabase().execSQL("insert into " + TBL + " " + INSERT_FIELDS + " values ('" + log.getName() + 
-				"', '" + log.getModel() + "', '" + entry.getType() + "', '" + entry.getDateTime() + "', '" + entry.getMain() +
+				"', '" + log.getName() + "', '" + entry.getType() + "', '" + entry.getDateTime() + "', '" + entry.getMain() +
 				"', '" + entry.getExt1() + "', '" + entry.getExt2() + "', '" + entry.getExt3() + "');");
 	}
 	
@@ -58,7 +58,7 @@ public class LoggingDatabase extends SQLiteOpenHelper{
 			String model = curs.getString(2);
 			double spd = curs.getDouble(4);
 			if(!logs.containsKey(name)){
-				logs.put(name, new RCLog(name, model, id));
+				logs.put(name, new RCLog(name, id));
 			}
 			if(spd == -1.) continue; //this is just a stub
 			RCLog log = logs.get(name);
@@ -81,7 +81,7 @@ public class LoggingDatabase extends SQLiteOpenHelper{
 		if(!curs.moveToFirst()) return null;
 		do{
 			if(log == null){
-				log = new RCLog(curs.getString(1), curs.getString(2), curs.getInt(0));
+				log = new RCLog(curs.getString(1), curs.getInt(0));
 			}
 			try{
 				log.addEntry(

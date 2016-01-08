@@ -25,8 +25,7 @@
     <!--  Logging Dialog-->
     <string name="logging">Aufzeichnung</string>
     <string name="log_title">Aufzeichnungs-Manager</string>
-    <string name="log_colon">Aufzeichnung: </string>
-    <string name="model_name">Name des Modells:</string>
+    <string name="log_colon">Modell: </string>
     <string name="log_name">Name der Aufzeichnung:</string>
     <string name="status">Status: </string>
     <string name="default_status">Zeichnet nicht auf</string>
