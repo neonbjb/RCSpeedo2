@@ -7,19 +7,37 @@
 
 package com.appliedanalog.rcspeedo.doppler;
 
+/**
+ * Construct which holds data for a Trend which has gone missing. The idea is that sometimes trends
+ * will go 'missing' but are actually undergoing a Doppler shift. These are the cases that we are
+ * trying to detect.
+ */
 public class MissingTrend extends Trend{
-    public int orig_index;
-    public int current_interest;
-    public int time_since_last_interest;
-    public int old_count;
+    /**
+     * Original FFT index this trend was on.
+     */
+    public int origIndex;
+    /**
+     * The FFT index the AudioDoppler currently suspects this Trend is at.
+     */
+    public int currentInterest;
+    /**
+     * Time since the trend was last confirmed.
+     */
+    public int timeSinceLastInterest;
+
+    /**
+     * The previous count of the trend before it went missing.
+     */
+    public int oldCount;
 
     public MissingTrend(Trend orig, int orig_ind, int ncount){
-        orig_index = orig_ind;
-        current_interest = orig_ind;
-        old_count = orig.count;
+        origIndex = orig_ind;
+        currentInterest = orig_ind;
+        oldCount = orig.count;
         count = ncount;
         index = orig.index;
-        time_since_last_interest = 0;
+        timeSinceLastInterest = 0;
         sig = orig.sig;
     }
 }
