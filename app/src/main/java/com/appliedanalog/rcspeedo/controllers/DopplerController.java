@@ -164,6 +164,7 @@ public class DopplerController implements Runnable {
      * @param aMode
      */
     public void setDopplerMode(AudioDopplerConfiguration aMode) {
+        // Lock in the frame size.. @todo - Add support for different sizes
         mDoppler.applyConfiguration(aMode.scaleFrameSize(FRAME_SIZE));
     }
 
