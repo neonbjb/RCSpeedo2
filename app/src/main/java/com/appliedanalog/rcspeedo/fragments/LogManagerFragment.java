@@ -26,9 +26,9 @@ import android.widget.Spinner;
 
 import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.Strings;
-import com.appliedanalog.rcspeedo.logs.EmptyLogEntry;
-import com.appliedanalog.rcspeedo.logs.LoggingDatabase;
-import com.appliedanalog.rcspeedo.logs.ModelLog;
+import com.appliedanalog.rcspeedo.controllers.data.logs.EmptyLogEntry;
+import com.appliedanalog.rcspeedo.controllers.LoggingDbController;
+import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -112,7 +112,7 @@ public class LogManagerFragment extends Fragment {
                 .setMessage(mStrings.CNFRM_BODY)
                 .setPositiveButton(mStrings.camel(mStrings.YES), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+                        LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
                         ldb.deleteModelLog(clog.getName());
                         mLogs.remove(clog.getName());
                     }
@@ -151,7 +151,7 @@ public class LogManagerFragment extends Fragment {
                     return;
                 }
                 Log.v(TAG, "Item selected");
-                LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+                LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
                 ModelLog log = ldb.getModelLog((String) mAvailableLogs.getSelectedItem());
                 setSelectedLog(log);
             }
@@ -173,7 +173,7 @@ public class LogManagerFragment extends Fragment {
         super.onStart();
 
         mIsInitializing = true;
-        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+        LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
         Collection<ModelLog> alllogs = ldb.getAllModels();
         Iterator<ModelLog> iter = alllogs.iterator();
 
@@ -209,7 +209,7 @@ public class LogManagerFragment extends Fragment {
             model = mStrings.LOG_DEFAULT_MODEL_NAME;
         }
         //insert it into the database
-        LoggingDatabase ldb = LoggingDatabase.getInstance(getActivity().getApplicationContext());
+        LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
         if (ldb.getModelLog(model) != null) {
             alert(mStrings.ERR_LOG_EXISTS);
             return;

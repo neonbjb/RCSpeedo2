@@ -5,7 +5,7 @@
  * no restrictions in such software.
  */
 
-package com.appliedanalog.rcspeedo.logs;
+package com.appliedanalog.rcspeedo.controllers.data.logs;
 
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
 import java.text.DateFormat;

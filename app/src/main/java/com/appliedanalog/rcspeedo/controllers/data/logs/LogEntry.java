@@ -5,7 +5,7 @@
  * no restrictions in such software.
  */
 
-package com.appliedanalog.rcspeedo.logs;
+package com.appliedanalog.rcspeedo.controllers.data.logs;
 
 /**
  * Class that represents a single row in the Logs database. Since these rows are of abstract types, this class also serves as

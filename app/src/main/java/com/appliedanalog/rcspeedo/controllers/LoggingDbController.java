@@ -5,12 +5,15 @@
  * no restrictions in such software.
  */
 
-package com.appliedanalog.rcspeedo.logs;
+package com.appliedanalog.rcspeedo.controllers;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.appliedanalog.rcspeedo.controllers.data.logs.LogEntry;
+import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -18,27 +21,27 @@ import java.util.HashMap;
 /**
  * Controller class that manages interaction with the SQLite database to persist logging data.
  */
-public class LoggingDatabase extends SQLiteOpenHelper{
+public class LoggingDbController extends SQLiteOpenHelper{
 	private static final String TBL = "logsv2";
 	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
 	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
 									"model varchar(100), loggroup varchar(100), type integer, date text, main text, ext1 text, ext2 text, ext3 text);";
 	
-	static LoggingDatabase sInstance = null;
+	static LoggingDbController sInstance = null;
 
     /**
      * Fetches the Singleton instance.
      * @param context Activity context.
      * @return
      */
-	public static LoggingDatabase getInstance(Context aContext){
+	public static LoggingDbController getInstance(Context aContext){
 		if(sInstance == null){
-			sInstance = new LoggingDatabase(aContext);
+			sInstance = new LoggingDbController(aContext);
 		}
 		return sInstance;
 	}
 	
-	private LoggingDatabase(Context aContext){
+	private LoggingDbController(Context aContext){
 		super(aContext, TBL, null, 2);
 	}
 
