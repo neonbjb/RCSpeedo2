@@ -129,7 +129,7 @@ public class LogManagerFragment extends Fragment {
                 alert(mStrings.ERR_NO_LOG_SELECTED);
                 return;
             }
-            File tlogfile = clog.generateSpeedLogFile();
+            File tlogfile = LoggingDbController.getInstance(getContext()).generateSpeedLogFile(clog);
             if (tlogfile == null) {
                 alert(mStrings.ERR_CANNOT_CREATE_LOG);
                 return;
@@ -208,18 +208,18 @@ public class LogManagerFragment extends Fragment {
             alert(mStrings.ERR_NAME_REQUIRED);
             model = mStrings.LOG_DEFAULT_MODEL_NAME;
         }
-        //insert it into the database
+        // Insert it into the database
         LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
         if (ldb.getModelLog(model) != null) {
             alert(mStrings.ERR_LOG_EXISTS);
             return;
         }
         ModelLog log = new ModelLog(model);
-        ldb.addLogEntry(new EmptyLogEntry(), log); //An empty entry will ensure this log shows up in the list of available logs.
-        //add it to the list of logs
+        ldb.addLogEntry(new EmptyLogEntry(), log); // An empty entry will ensure this log shows up in the list of available logs.
+        // Add it to the list of logs
         mLogs.add(model);
         mLogMap.put(model, log);
-        //select it (make sure selectLog() is called)
+        // Aelect it (make sure selectLog() is called)
         mAvailableLogs.setSelection(mLogs.getCount() - 1);
         setSelectedLog(log);
     }

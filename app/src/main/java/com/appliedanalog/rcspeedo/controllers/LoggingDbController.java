@@ -13,8 +13,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.appliedanalog.rcspeedo.controllers.data.logs.LogEntry;
+import com.appliedanalog.rcspeedo.controllers.data.logs.LogGroup;
 import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
+import com.appliedanalog.rcspeedo.controllers.data.logs.SpeedLogEntry;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -26,6 +31,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
 	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
 	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
 									"model varchar(100), loggroup varchar(100), type integer, date text, main text, ext1 text, ext2 text, ext3 text);";
+    private final String RCSPEEDO_TEMP_DIR = "/sdcard/data/rcspeedo/";
 	
 	static LoggingDbController sInstance = null;
 
@@ -119,6 +125,47 @@ public class LoggingDbController extends SQLiteOpenHelper{
 		curs.close();
 		return log;
 	}
+
+    /**
+     * Generates a CSV file with all of the entries bound to the specified model.
+     * @param aLog The model to scan.
+     * @return
+     */
+    public File generateSpeedLogFile(ModelLog aLog) {
+        try {
+            File dir = new File(RCSPEEDO_TEMP_DIR);
+            if (!dir.exists() && !dir.mkdirs()) {
+                System.out.println("ERROR! Couldn't create logging output directory: '" + RCSPEEDO_TEMP_DIR + "'");
+                return null;
+            }
+            File f = File.createTempFile("rcslog", ".csv");
+            File realfile = new File(RCSPEEDO_TEMP_DIR + f.getName());
+            PrintWriter pw = new PrintWriter(new FileWriter(realfile));
+            //print out the header
+            String logdate = null;
+            pw.println(aLog.getName() + "\n");
+            for(LogGroup group : aLog.getLogGroups()) {
+                for(LogEntry entry : group.getLogEntries()) {
+                    if (entry.getType() == LogEntry.SPEED_ENTRY) {
+                        SpeedLogEntry sentry = (SpeedLogEntry) entry;
+                        if (logdate == null || !logdate.equals(sentry.getNiceDate())) {
+                            logdate = sentry.getNiceDate();
+                            pw.println("Entries for " + logdate);
+                        }
+                        pw.println(sentry.getNiceTime() + "," + sentry.getNiceSpeed());
+                    }
+                }
+                pw.println();
+            }
+
+            pw.close();
+            realfile.deleteOnExit();
+            return realfile;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     // Interface methods for SQLiteOpenHelper.
 

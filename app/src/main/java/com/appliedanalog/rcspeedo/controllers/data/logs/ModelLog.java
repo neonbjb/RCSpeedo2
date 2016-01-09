@@ -7,10 +7,8 @@
 
 package com.appliedanalog.rcspeedo.controllers.data.logs;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -43,16 +41,19 @@ public class ModelLog {
 
     /**
      * Add the specified entry to the log.
-     * @param e
+     * @param aEntry
      */
-	public void addEntry(LogEntry e){
-        if(mLogGroups.containsKey(e.getLogGroup())) {
-            LogGroup group = mLogGroups.get(e.getLogGroup());
-            group.addEntry(e);
-        } else {
-            LogGroup group = new LogGroup(e.getLogGroup());
-            mLogGroups.put(group.getGroupId(), group);
-            group.addEntry(e);
+	public void addEntry(LogEntry aEntry){
+        if(aEntry instanceof SpeedLogEntry) {
+            SpeedLogEntry speedEntry = (SpeedLogEntry)aEntry;
+            if(mLogGroups.containsKey(speedEntry.getLogGroup())) {
+                LogGroup group = mLogGroups.get(speedEntry.getLogGroup());
+                group.addEntry(speedEntry);
+            } else {
+                LogGroup group = new LogGroup(speedEntry.getLogGroup());
+                mLogGroups.put(group.getGroupId(), group);
+                group.addEntry(speedEntry);
+            }
         }
 	}
 
@@ -73,56 +74,7 @@ public class ModelLog {
 		return mModelName;
 	}
 
-    /**
-     * Returns the number of entries in this log.
-     * @return
-     */
-	public int getNumberLogGroups(){
-		if(mLogGroups == null){
-			return 0;
-		}
-		return mLogGroups.keySet().size();
-	}
-	
-	final String RCSPEEDO_TEMP_DIR = "/sdcard/data/rcspeedo/";
-
-    /**
-     * Generates a CSV file with all of the entires in this log.
-     * @return
-     */
-	public File generateSpeedLogFile() {
-        try {
-            File dir = new File(RCSPEEDO_TEMP_DIR);
-            if (!dir.exists() && !dir.mkdirs()) {
-                System.out.println("ERROR! Couldn't create logging output directory: '" + RCSPEEDO_TEMP_DIR + "'");
-                return null;
-            }
-            File f = File.createTempFile("rcslog", ".csv");
-            File realfile = new File(RCSPEEDO_TEMP_DIR + f.getName());
-            PrintWriter pw = new PrintWriter(new FileWriter(realfile));
-            //print out the header
-            String logdate = null;
-            pw.println(mModelName + "\n");
-            for(LogGroup group : mLogGroups.values()) {
-                for(LogEntry entry : group.getLogEntries()) {
-                    if (entry.getType() == LogEntry.SPEED_ENTRY) {
-                        SpeedLogEntry sentry = (SpeedLogEntry) entry;
-                        if (logdate == null || !logdate.equals(sentry.getNiceDate())) {
-                            logdate = sentry.getNiceDate();
-                            pw.println("Entries for " + logdate);
-                        }
-                        pw.println(sentry.getNiceTime() + "," + sentry.getNiceSpeed());
-                    }
-                }
-                pw.println();
-            }
-
-            pw.close();
-            realfile.deleteOnExit();
-            return realfile;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Collection<LogGroup> getLogGroups() {
+        return mLogGroups.values();
     }
 }

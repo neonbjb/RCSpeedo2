@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 /**
  * Represents a set of log entries that are all recorded in one session. In the context of this app,
- * this will generally be a set of passes at a point in time.
+ * this will generally be a set of passes at a point in mTime.
  */
 public class LogGroup {
     String mGroupId;
@@ -26,7 +26,7 @@ public class LogGroup {
      * Adds the specified LogEntry to this group.
      * @param aEntry
      */
-    public void addEntry(LogEntry aEntry) {
+    public void addEntry(SpeedLogEntry aEntry) {
         aEntry.setLogGroup(mGroupId);
         mLogEntries.add(aEntry);
     }

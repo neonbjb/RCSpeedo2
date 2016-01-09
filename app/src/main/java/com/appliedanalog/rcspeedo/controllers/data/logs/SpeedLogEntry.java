@@ -12,69 +12,124 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 
+/**
+ * Class that represents a log entry for a specific detected speed.
+ */
 public class SpeedLogEntry extends LogEntry {
-	Date time;
-	double speed;
+	private Date mTime;
+    private double mSpeed;
+    private String mLogGroup;
 	
-    static DateFormat datesdf = DateFormat.getDateInstance();
-    static DateFormat timesdf = DateFormat.getTimeInstance();
-    static DateFormat fullsdf = DateFormat.getDateTimeInstance();
-	
+    static DateFormat sDateFormat = DateFormat.getDateInstance();
+    static DateFormat sTimeFormat = DateFormat.getTimeInstance();
+    static DateFormat sDateTimeFormat = DateFormat.getDateTimeInstance();
+
+    /**
+     * Constructor.
+     */
 	public SpeedLogEntry(){
-		time = new Date(System.currentTimeMillis());
-		speed = 0.;
+		mTime = new Date(System.currentTimeMillis());
+		mSpeed = 0.;
 	}
-	
-	public SpeedLogEntry(double s){
-		this(new Date(System.currentTimeMillis()), s);
+
+    /**
+     * Creates a log entry with the specified speed, occurring right now.
+     * @param aSpeed Speed in m/s.
+     * @param aLogGroup The group this log entry belongs to.
+     */
+	public SpeedLogEntry(double aSpeed, String aLogGroup){
+		this(new Date(System.currentTimeMillis()), aSpeed, aLogGroup);
 	}
-	
-	public SpeedLogEntry(Date t, double s){
-		time = t;
-		speed = s;
+
+    /**
+     * Creates a log entry with the specified speed, occurring at the specified time.
+     * @param aTime Time when the detection occurred.
+     * @param aSpeed Speed in m/s.
+     * @param aLogGroup The group this log entry belongs to.
+     */
+	public SpeedLogEntry(Date aTime, double aSpeed, String aLogGroup){
+		mTime = aTime;
+		mSpeed = aSpeed;
+        mLogGroup = aLogGroup;
 	}
-	
-	public SpeedLogEntry(String t, String s) throws ParseException{
-		time = fullsdf.parse(t);
-		speed = Double.parseDouble(s);
+
+    /**
+     * Creates a log entry from a string-formatted time value.
+     * @param aTime Time when the detection occurred as a string.
+     * @param aSpeed Speed in m/s.
+     * @param aLogGroup The group this log entry belongs to.
+     * @throws ParseException
+     */
+	public SpeedLogEntry(String aTime, String aSpeed, String aLogGroup) throws ParseException{
+		mTime = sDateTimeFormat.parse(aTime);
+		mSpeed = Double.parseDouble(aSpeed);
+        mLogGroup = aLogGroup;
 	}
-	
+
+    /**
+     * Get the time when the speed detection occurred.
+     * @return
+     */
 	public String getNiceTime(){
-		return timesdf.format(time);
+		return sTimeFormat.format(mTime);
 	}
-	
+
+    /**
+     * Get the date when the speed detection occurred.
+     * @return
+     */
 	public String getNiceDate(){
-		return datesdf.format(time);
+		return sDateFormat.format(mTime);
 	}
-	
+
+    /**
+     * Gets the speed, formatted in the locally specified units.
+     * @return
+     */
 	public String getNiceSpeed(){
-		return UnitManager.getInstance().getDisplaySpeed(speed);
+		return UnitManager.getInstance().getDisplaySpeed(mSpeed);
 	}
-	
-	public String getFullDateTime(){
-		return fullsdf.format(time);
-	}
-	
+
+    /**
+     * Set the group that this entry belongs to.
+     * @param aNewGroup
+     */
+    public void setLogGroup(String aNewGroup) {
+        mLogGroup = aNewGroup;
+    }
+
+    // Overridden from LogEntry.
+    @Override
 	public int getType(){
 		return SPEED_ENTRY;
 	}
-	
+
+    @Override
+    public String getLogGroup() {
+        return mLogGroup;
+    }
+
+    @Override
 	public String getMain(){
-		return Double.toString(speed);
+		return Double.toString(mSpeed);
 	}
-	
+
+    @Override
 	public String getDateTime(){
-		return getFullDateTime();
+		return sDateTimeFormat.format(mTime);
 	}
-	
+
+    @Override
 	public String getExt1(){
 		return "";
 	}
-	
+
+    @Override
 	public String getExt2(){
 		return "";
 	}
-	
+
+    @Override
 	public String getExt3(){
 		return "";
 	}

@@ -14,6 +14,9 @@ public class EmptyLogEntry extends LogEntry {
 		return EMPTY_ENTRY;
 	}
 
+    @Override
+    public String getLogGroup() { return null; }
+
 	@Override
 	public String getMain() {
 		return "";
