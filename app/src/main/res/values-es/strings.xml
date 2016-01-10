@@ -95,10 +95,6 @@
 		<item>Modo 100MPH+</item>
 		<item>Modo Fast Pass</item>
 	</string-array>
-	<string-array name="available_mode_ids"><item>default_mode</item>
-		<item>hi_speed_mode</item>
-		<item>fast_pass_mode</item>
-	</string-array>
 	<string-array name="available_speed_units_vocal">
 	    <item>Millas por hora</item>
 		<item>Kilómetros por hora</item>

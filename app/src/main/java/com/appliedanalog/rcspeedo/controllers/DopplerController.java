@@ -7,6 +7,7 @@
 
 package com.appliedanalog.rcspeedo.controllers;
 
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
@@ -20,7 +21,7 @@ import java.util.ArrayList;
  * mic into the AudioDoppler when RCSpeedo is started and fires out speed events as they are
  * detected.
  */
-public class DopplerController implements Runnable {
+public class DopplerController implements Runnable, SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Constants.
     static final String TAG = "DopplerController";
@@ -99,11 +100,23 @@ public class DopplerController implements Runnable {
         mSpeeds = new ArrayList<DetectedSpeed>();
         mHighestSpeed = new DetectedSpeed(0);
         mDoppler.setTemperature(WeatherController.getInstance().getLastTemperature());
+    }
 
-        // Register for updates to the temperature.
+    /**
+     * Initializes this singleton. Should be called once on startup.
+     *
+     * @param aPrefs Shared preferences object which tells this controller what mode it should run in.
+     */
+    public void init( SharedPreferences aPrefs) {
+        aPrefs.registerOnSharedPreferenceChangeListener(this);
+        // Trigger the event once to get the desired binding to start with.
+        onSharedPreferenceChanged(aPrefs, SettingsKeys.DOPPLER_MODE_KEY);
+
+        // Register with the weather controller for temperature updates.
         WeatherController.getInstance().addListener(new WeatherController.TemperatureListener() {
             @Override
             public void temperatureChanged(int aNewTemp, boolean aTemperatureWasAutomaticallySet) {
+                Log.v(TAG, "Temperature set: " + aNewTemp);
                 mDoppler.setTemperature(aNewTemp);
             }
         });
@@ -282,6 +295,22 @@ public class DopplerController implements Runnable {
         mIsActive = false;
         for (DopplerListener listener : mSpeedListeners) {
             listener.dopplerActiveStateChanged(mIsActive);
+        }
+    }
+
+    // Event handlers.
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if(SettingsKeys.DOPPLER_MODE_KEY.equals(key)) {
+            String modeSelection = sharedPreferences.getString(SettingsKeys.DOPPLER_MODE_KEY, SettingsKeys.DOPPLER_MODE_DEFAULT);
+            Log.v(TAG, "DOPPLER_MODE_KEY changed - changing mode: " + modeSelection);
+            if (modeSelection.equals(SettingsKeys.DOPPLER_MODE_DEFAULT)) {
+                setDopplerMode(AudioDopplerConfiguration.DEFAULT);
+            } else if(modeSelection.equals(SettingsKeys.DOPPLER_MODE_FAST_PASS)) {
+                setDopplerMode(AudioDopplerConfiguration.FAST_PASS);
+            } else if(modeSelection.equals(SettingsKeys.DOPPLER_MODE_HI_SPEED)) {
+                setDopplerMode(AudioDopplerConfiguration.CFG_200_PLUS);
+            }
         }
     }
 

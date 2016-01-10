@@ -7,9 +7,9 @@
 
 package com.appliedanalog.rcspeedo;
 
-import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -23,28 +23,16 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
-import com.appliedanalog.rcspeedo.controllers.LoggingDbController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
-import com.appliedanalog.rcspeedo.controllers.data.logs.GroupInfoEntry;
-import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
-import com.appliedanalog.rcspeedo.controllers.data.logs.SpeedLogEntry;
 import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
 import com.appliedanalog.rcspeedo.fragments.MainFragment;
 import com.appliedanalog.rcspeedo.fragments.SettingsFragment;
-
-import java.util.Collection;
 
 /**
  * Main activity of RCSpeedo.
@@ -52,7 +40,7 @@ import java.util.Collection;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    // Fragments which can be swapped in and out on request
+    // Fragments which can be swapped in and out on request.
     MainFragment mainFragment;
     LogManagerFragment logFragment;
     SettingsFragment settingsFragment;
@@ -74,15 +62,18 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // Initialize Strings localizer
+        // Initialize Strings localizer.
         Strings.init(getResources());
 
-        // Initialize the unit manager
+        // Initialize the unit manager.
         UnitManager.getInstance().init(this);
 
-        // Initialize the WeatherController
-        WeatherController.getInstance().init((LocationManager)getSystemService(Context.LOCATION_SERVICE),
-                                                PreferenceManager.getDefaultSharedPreferences(this));
+        // Initialize the WeatherController.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        WeatherController.getInstance().init((LocationManager)getSystemService(Context.LOCATION_SERVICE), prefs);
+
+        // Initialize the DopplerController.
+        DopplerController.getInstance().init(prefs);
 
         // Initialize the background fragments.
         settingsFragment = new SettingsFragment();
@@ -149,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
         // Replace whatever is in the fragment_container view with this fragment,
-        // and add the transaction to the back stack so the user can navigate back
+        // and add the transaction to the back stack so the user can navigate back.
         transaction.replace(R.id.fragment_container, aFragment);
         if(aBackStackAppropriate){
             transaction.addToBackStack(null);
