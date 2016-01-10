@@ -18,7 +18,7 @@ import java.util.Date;
 public class SpeedLogEntry extends LogEntry {
 	private Date mTime;
     private double mSpeed;
-    private String mLogGroup;
+    private int mLogGroup;
 	
     static DateFormat sDateFormat = DateFormat.getDateInstance();
     static DateFormat sTimeFormat = DateFormat.getTimeInstance();
@@ -37,7 +37,7 @@ public class SpeedLogEntry extends LogEntry {
      * @param aSpeed Speed in m/s.
      * @param aLogGroup The group this log entry belongs to.
      */
-	public SpeedLogEntry(double aSpeed, String aLogGroup){
+	public SpeedLogEntry(double aSpeed, int aLogGroup){
 		this(new Date(System.currentTimeMillis()), aSpeed, aLogGroup);
 	}
 
@@ -47,7 +47,7 @@ public class SpeedLogEntry extends LogEntry {
      * @param aSpeed Speed in m/s.
      * @param aLogGroup The group this log entry belongs to.
      */
-	public SpeedLogEntry(Date aTime, double aSpeed, String aLogGroup){
+	public SpeedLogEntry(Date aTime, double aSpeed, int aLogGroup){
 		mTime = aTime;
 		mSpeed = aSpeed;
         mLogGroup = aLogGroup;
@@ -60,7 +60,7 @@ public class SpeedLogEntry extends LogEntry {
      * @param aLogGroup The group this log entry belongs to.
      * @throws ParseException
      */
-	public SpeedLogEntry(String aTime, String aSpeed, String aLogGroup) throws ParseException{
+	public SpeedLogEntry(String aTime, String aSpeed, int aLogGroup) throws ParseException{
 		mTime = sDateTimeFormat.parse(aTime);
 		mSpeed = Double.parseDouble(aSpeed);
         mLogGroup = aLogGroup;
@@ -94,7 +94,7 @@ public class SpeedLogEntry extends LogEntry {
      * Set the group that this entry belongs to.
      * @param aNewGroup
      */
-    public void setLogGroup(String aNewGroup) {
+    public void setLogGroup(int aNewGroup) {
         mLogGroup = aNewGroup;
     }
 
@@ -105,7 +105,7 @@ public class SpeedLogEntry extends LogEntry {
 	}
 
     @Override
-    public String getLogGroup() {
+    public int getLogGroup() {
         return mLogGroup;
     }
 

@@ -15,7 +15,7 @@ public class EmptyLogEntry extends LogEntry {
 	}
 
     @Override
-    public String getLogGroup() { return null; }
+    public int getLogGroup() { return 0; }
 
 	@Override
 	public String getMain() {

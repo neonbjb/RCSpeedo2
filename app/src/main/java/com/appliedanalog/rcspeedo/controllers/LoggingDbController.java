@@ -30,7 +30,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
 	private static final String TBL = "logsv2";
 	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
 	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
-									"model varchar(100), loggroup varchar(100), type integer, date text, main text, ext1 text, ext2 text, ext3 text);";
+									"model varchar(100), loggroup int default 0, type integer default 1, date text, main text, ext1 text, ext2 text, ext3 text);";
     private final String RCSPEEDO_TEMP_DIR = "/sdcard/data/rcspeedo/";
 	
 	static LoggingDbController sInstance = null;
@@ -87,7 +87,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
 			if(spd == -1.) continue; //this is just a stub
 			ModelLog log = logs.get(name);
 			try{
-				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(2), curs.getString(4),
+				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(4),
 														curs.getString(5), curs.getString(6),
 									      				curs.getString(7), curs.getString(8)));
 			}catch(Exception e){
@@ -114,7 +114,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
 			}
 			try{
 				log.addEntry(
-						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getString(2), curs.getString(4),
+						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(4),
 												   curs.getString(5), curs.getString(6),
 								      			   curs.getString(7), curs.getString(8)));
 			}catch(Exception e){

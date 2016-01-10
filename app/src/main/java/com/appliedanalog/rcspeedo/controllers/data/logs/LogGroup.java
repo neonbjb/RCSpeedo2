@@ -14,10 +14,10 @@ import java.util.ArrayList;
  * this will generally be a set of passes at a point in mTime.
  */
 public class LogGroup {
-    String mGroupId;
+    int mGroupId;
     private ArrayList<LogEntry> mLogEntries;
 
-    public LogGroup(String aId) {
+    public LogGroup(int aId) {
         mGroupId = aId;
         mLogEntries = new ArrayList<>();
     }
@@ -35,7 +35,7 @@ public class LogGroup {
      * Returns the logging group ID.
      * @return
      */
-    public String getGroupId() {
+    public int getGroupId() {
         return mGroupId;
     }
 

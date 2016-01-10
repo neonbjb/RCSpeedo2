@@ -16,7 +16,7 @@ import java.util.HashMap;
  */
 public class ModelLog {
     String mModelName;
-    HashMap<String, LogGroup> mLogGroups;
+    HashMap<Integer, LogGroup> mLogGroups;
 	boolean filled;
 
     /**

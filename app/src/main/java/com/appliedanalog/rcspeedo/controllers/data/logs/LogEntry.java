@@ -20,7 +20,7 @@ public abstract class LogEntry {
 	
 	private int mId = NOT_IN_DATABASE;
 
-	public static LogEntry constructLogEntry(int aId, int aType, String aLogGroup, String aMain, String aDateTime, String aExt1, String aExt2, String aExt3){
+	public static LogEntry constructLogEntry(int aId, int aType, int aLogGroup, String aMain, String aDateTime, String aExt1, String aExt2, String aExt3){
 		LogEntry ret = null;
 		switch(aType){
 		case EMPTY_ENTRY:
@@ -53,10 +53,10 @@ public abstract class LogEntry {
 	public abstract int getType();
 
     /**
-     * Returns the group that this LogEntry belongs to. Should return null if grouping is not supported.
+     * Returns the group that this LogEntry belongs to. Should return 0 if grouping is not supported.
      * @return
      */
-    public abstract String getLogGroup();
+    public abstract int getLogGroup();
 
     /**
      * Returns the main textual information this entry stores.
