@@ -12,11 +12,22 @@
 		android:layout_alignParentTop="true"
 		android:layout_width="fill_parent" 
 		android:layout_height="wrap_content"></Spinner>
+	<EditText
+		android:id="@+id/tExtraInfo"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:lines="3"
+		android:minLines="3"
+		android:gravity="top|left"
+		android:scrollbars="vertical"
+		android:layout_below="@id/lAvailableLogs"
+		android:hint="@string/hint_text_log_extra_info"
+	/>
     <RelativeLayout
     	  android:id="@+id/rlLoggingChoice"
 		  android:orientation="horizontal"
     	  android:layout_alignParentLeft="true"
-    	  android:layout_below="@+id/lAvailableLogs"
+    	  android:layout_below="@id/tExtraInfo"
 		  android:layout_width="fill_parent"
 		  android:layout_height="wrap_content">
 	    <Button

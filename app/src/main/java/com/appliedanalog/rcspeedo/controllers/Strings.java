@@ -45,6 +45,7 @@ public class Strings {
 	public String ERR_UNLOCKER_DEFAULT = "Error unlocking app.";
 	public String ERR_UNLOCKER_UNKNOWN = "Unknown error unlocking app.";
 	public String ERR_NO_GOOGLE_ACCOUNT = "Cannot Unlock: No Google Account";
+    public String ERR_NO_SPEEDS = "There are no speeds detected to save. Use this button after some speeds have been detected.";
 	
 	//Strings used to send e-mail notifications.
 	public String MAIL_SPEED_SUBJECT = "RCSpeedo High Speed";
@@ -124,6 +125,7 @@ public class Strings {
 		inst.C = res.getString(R.string.c);
 		inst.FL = res.getString(R.string.fl);
 		inst.F = res.getString(R.string.f);
+        inst.ERR_NO_SPEEDS = res.getString(R.string.err_no_speeds);
 		Log.d("TAAG", res.getString(R.string.stop_listening));
 	}
 	private Strings(){

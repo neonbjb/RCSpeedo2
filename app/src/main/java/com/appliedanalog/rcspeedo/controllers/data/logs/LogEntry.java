@@ -29,10 +29,13 @@ public abstract class LogEntry implements Comparable<LogEntry> {
                 break;
             case SPEED_ENTRY:
                 try {
-                    ret = new SpeedLogEntry(aMain, aDateTime, aLogGroup);
+                    ret = new SpeedLogEntry(aLogGroup, aMain, aDateTime);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                break;
+            case GROUP_INFO_ENTRY:
+                ret = new GroupInfoEntry(aLogGroup, aMain);
                 break;
         }
         ret.mId = aId;

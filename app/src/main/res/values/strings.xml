@@ -50,6 +50,7 @@
     <string name="use_log">Use Log</string>
     <string name="log_manager">Log Manager</string>
     <string name="cancel">Cancel</string>
+    <string name="hint_text_log_extra_info">Enter any details about this flying session here. (e.g. Batteries used, weather, etc)</string>
 
     <!--  SettingsFragment Dialog -->
     <string name="settings_title">Settings</string>
@@ -78,6 +79,7 @@
     <string name="err_unlocker_default">Error unlocking app.</string>
     <string name="err_unlocker_unknown">Cannot Unlock: No Internet</string>
     <string name="err_no_google_account">Cannot Unlock: No Google Account</string>
+    <string name="err_no_speeds">There are no speeds detected to save. Use this button after some speeds have been detected.</string>
 
     <string name="mail_speed_subject">RCSpeedo High Speed</string>
     <string name="mail_speed_pretext_no_model">My model airplane clocked </string>

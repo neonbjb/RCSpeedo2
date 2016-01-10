@@ -60,10 +60,10 @@ public class SpeedLogEntry extends LogEntry {
      * @param aLogGroup The group this log entry belongs to.
      * @throws ParseException
      */
-	public SpeedLogEntry(String aTime, String aSpeed, int aLogGroup) throws ParseException{
-		mTime = sDateTimeFormat.parse(aTime);
-		mSpeed = Double.parseDouble(aSpeed);
+	public SpeedLogEntry(int aLogGroup, String aSpeed, String aTime) throws ParseException{
         mLogGroup = aLogGroup;
+        mTime = sDateTimeFormat.parse(aTime);
+		mSpeed = Double.parseDouble(aSpeed);
 	}
 
     /**

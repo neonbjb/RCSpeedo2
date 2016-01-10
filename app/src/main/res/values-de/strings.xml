@@ -47,6 +47,7 @@
     <string name="use_log">Aufzeichnung verwenden</string>
     <string name="log_manager">Aufzeichnungs-Manager</string>
     <string name="cancel">Cancel</string>
+    <string name="hint_text_log_extra_info">Geben Sie alle Details über diese Flugbetrieb hier.</string>
     
     <!--  SettingsFragment Dialog -->
     <string name="settings_title">Einstellungen</string>
@@ -75,6 +76,7 @@
 	<string name="err_unlocker_default">Error unlocking app.</string>
 	<string name="err_unlocker_unknown">Unknown error unlocking app.</string>
 	<string name="err_no_google_account">Cannot Unlock: No Google Account</string>
+    <string name="err_no_speeds">Es sind keine Geschwindigkeiten erfasst, um zu speichern. Verwenden Sie diese Taste, nachdem einige Geschwindigkeiten festgestellt wurden.</string>
 	
 	<string name="mail_speed_subject">RCSpeedo High Speed</string>
 	<string name="mail_speed_pretext_no_model">My model airplane clocked </string>

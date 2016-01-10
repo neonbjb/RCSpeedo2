@@ -47,6 +47,7 @@
     <string name="use_log">Usar grabación</string>
     <string name="log_manager">Administrador de Grabaciones</string>
     <string name="cancel">Cancelar</string>
+    <string name="hint_text_log_extra_info">Introduzca los detalles acerca de esta sesión de vuelo aquí.</string>
     
     <!--  SettingsFragment Dialog -->
     <string name="settings_title">Configuración</string>
@@ -75,6 +76,7 @@
 	<string name="err_unlocker_default">Error unlocking app.</string>
 	<string name="err_unlocker_unknown">Unknown error unlocking app.</string>
 	<string name="err_no_google_account">Cannot Unlock: No Google Account</string>
+    <string name="err_no_speeds">No hay velocidades detectadas guardar. Utilice este botón después de que se han detectado algunas velocidades.</string>
 	
 	<string name="mail_speed_subject">RCSpeedo High Speed</string>
 	<string name="mail_speed_pretext_no_model">My model airplane clocked </string>

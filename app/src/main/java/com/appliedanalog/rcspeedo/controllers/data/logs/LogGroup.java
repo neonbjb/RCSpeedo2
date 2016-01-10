@@ -27,8 +27,7 @@ public class LogGroup {
      * Adds the specified LogEntry to this group.
      * @param aEntry
      */
-    public void addEntry(SpeedLogEntry aEntry) {
-        aEntry.setLogGroup(mGroupId);
+    public void addEntry(LogEntry aEntry) {
         mLogEntries.add(aEntry);
     }
 

@@ -11,6 +11,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.appliedanalog.rcspeedo.controllers.data.logs.LogEntry;
 import com.appliedanalog.rcspeedo.controllers.data.logs.LogGroup;
@@ -27,6 +28,8 @@ import java.util.HashMap;
  * Controller class that manages interaction with the SQLite database to persist logging data.
  */
 public class LoggingDbController extends SQLiteOpenHelper{
+    final String TAG = "LogDbController";
+
 	private static final String TBL = "logsv2";
 	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
 	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
@@ -52,14 +55,17 @@ public class LoggingDbController extends SQLiteOpenHelper{
 	}
 
     /**
-     * Add an entry to the specified ModelLog. This entry will persist after this method is called.
+     * Add an entry to the specified ModelLog and the backing database. This entry will persist after this method is called.
      * @param aEntry
      * @param aLog
      */
 	public void addLogEntry(LogEntry aEntry, ModelLog aLog){
-		getWritableDatabase().execSQL("insert into " + TBL + " " + INSERT_FIELDS + " values ('" + aLog.getName() +
+        aLog.addEntry(aEntry);
+		final String sql = "insert into " + TBL + " " + INSERT_FIELDS + " values ('" + aLog.getName() +
                 "', '" + aEntry.getLogGroup() + "', '" + aEntry.getType() + "', '" + aEntry.getDateTime() + "', '" + aEntry.getMain() +
-                "', '" + aEntry.getExt1() + "', '" + aEntry.getExt2() + "', '" + aEntry.getExt3() + "');");
+                "', '" + aEntry.getExt1() + "', '" + aEntry.getExt2() + "', '" + aEntry.getExt3() + "');";
+        Log.v(TAG, sql);
+        getWritableDatabase().execSQL(sql);
 	}
 
     /**
@@ -80,15 +86,18 @@ public class LoggingDbController extends SQLiteOpenHelper{
 		if(!curs.moveToFirst()) return logs.values();
 		do{
 			String name = curs.getString(1);
-			double spd = curs.getDouble(4);
-			if(!logs.containsKey(name)){
-				logs.put(name, new ModelLog(name));
-			}
-			if(spd == -1.) continue; //this is just a stub
+            int type = curs.getInt(3);
+			if(type == LogEntry.EMPTY_ENTRY) {
+                continue;
+            }
+
+            if(!logs.containsKey(name)) {
+                logs.put(name, new ModelLog(name));
+            }
 			ModelLog log = logs.get(name);
 			try{
-				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(4),
-														curs.getString(5), curs.getString(6),
+				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
+														curs.getString(4), curs.getString(6),
 									      				curs.getString(7), curs.getString(8)));
 			}catch(Exception e){
 				System.out.println("Parse exception with a log date!");
@@ -166,6 +175,20 @@ public class LoggingDbController extends SQLiteOpenHelper{
         }
     }
 
+    /**
+     * Generates a GroupId value that is unique in the backing database.
+     * @return
+     */
+    public int generateGroupId() {
+        // Start with a good candidate.
+        int potentialGroupId = (int) System.currentTimeMillis();
+        // Check that it is unique
+        while(!isIdUnique(potentialGroupId)) {
+            potentialGroupId++;
+        }
+        return potentialGroupId;
+    }
+
     // Interface methods for SQLiteOpenHelper.
 
     @Override
@@ -177,4 +200,22 @@ public class LoggingDbController extends SQLiteOpenHelper{
 	public void onUpgrade(SQLiteDatabase aDb, int oldVersion, int newVersion) {
 		//called when alter table is needed, will be implemented if/when it is needed
 	}
+
+    private boolean isIdUnique(int aId) {
+        // IDs of 0 are invalid
+        if(aId == 0) {
+            return false;
+        }
+
+        try {
+            Cursor curs = getReadableDatabase().rawQuery("select id from " + TBL + " where loggroup='" + aId + "';", null);
+            boolean result = curs.moveToFirst();
+            curs.close();
+            return !result;
+        } catch(Exception e) {
+            e.printStackTrace();
+            // Make a wild guess.
+            return true;
+        }
+    }
 }

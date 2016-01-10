@@ -214,6 +214,14 @@ public class DopplerController implements Runnable {
     }
 
     /**
+     * Retrieve the list of detected speeds since the controller was last cleared.
+     * @return
+     */
+    public ArrayList<DetectedSpeed> getDetectedSpeeds() {
+        return mSpeeds;
+    }
+
+    /**
      * Implements Runnable.run() - should not be called externally.
      */
     @Override

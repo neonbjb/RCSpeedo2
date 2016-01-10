@@ -24,6 +24,7 @@ public class ModelLog {
      * @param aModelName
      */
 	public ModelLog(String aModelName){
+        mLogGroups = new HashMap<>();
 		this.mModelName = aModelName;
 		filled = false;
 	}
@@ -44,15 +45,14 @@ public class ModelLog {
      * @param aEntry
      */
 	public void addEntry(LogEntry aEntry){
-        if(aEntry instanceof SpeedLogEntry) {
-            SpeedLogEntry speedEntry = (SpeedLogEntry)aEntry;
-            if(mLogGroups.containsKey(speedEntry.getLogGroup())) {
-                LogGroup group = mLogGroups.get(speedEntry.getLogGroup());
-                group.addEntry(speedEntry);
+        if(aEntry.getLogGroup() != 0) {
+            if(mLogGroups.containsKey(aEntry.getLogGroup())) {
+                LogGroup group = mLogGroups.get(aEntry.getLogGroup());
+                group.addEntry(aEntry);
             } else {
-                LogGroup group = new LogGroup(speedEntry.getLogGroup());
+                LogGroup group = new LogGroup(aEntry.getLogGroup());
                 mLogGroups.put(group.getGroupId(), group);
-                group.addEntry(speedEntry);
+                group.addEntry(aEntry);
             }
         }
 	}
