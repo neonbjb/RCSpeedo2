@@ -8,6 +8,7 @@
 package com.appliedanalog.rcspeedo.controllers.data.logs;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Represents a set of log entries that are all recorded in one session. In the context of this app,
@@ -37,6 +38,14 @@ public class LogGroup {
      */
     public int getGroupId() {
         return mGroupId;
+    }
+
+    /**
+     * Sorts the log entries in this group. See LogEntry.compareTo for information on how entries are
+     * sorted.
+     */
+    public void sort() {
+        Collections.sort(mLogEntries);
     }
 
     /**

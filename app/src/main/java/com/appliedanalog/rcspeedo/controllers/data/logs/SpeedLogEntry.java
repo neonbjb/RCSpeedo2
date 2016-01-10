@@ -67,6 +67,14 @@ public class SpeedLogEntry extends LogEntry {
 	}
 
     /**
+     * Returns the time this object is storing as a Date object.
+     * @return
+     */
+    public Date getTime() {
+        return mTime;
+    }
+
+    /**
      * Get the time when the speed detection occurred.
      * @return
      */

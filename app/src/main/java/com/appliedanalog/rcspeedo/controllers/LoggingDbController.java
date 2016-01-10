@@ -142,17 +142,16 @@ public class LoggingDbController extends SQLiteOpenHelper{
             File realfile = new File(RCSPEEDO_TEMP_DIR + f.getName());
             PrintWriter pw = new PrintWriter(new FileWriter(realfile));
             //print out the header
-            String logdate = null;
             pw.println(aLog.getName() + "\n");
             for(LogGroup group : aLog.getLogGroups()) {
+                // Sort the group for the most appropriate display.
+                group.sort();
                 for(LogEntry entry : group.getLogEntries()) {
                     if (entry.getType() == LogEntry.SPEED_ENTRY) {
                         SpeedLogEntry sentry = (SpeedLogEntry) entry;
-                        if (logdate == null || !logdate.equals(sentry.getNiceDate())) {
-                            logdate = sentry.getNiceDate();
-                            pw.println("Entries for " + logdate);
-                        }
-                        pw.println(sentry.getNiceTime() + "," + sentry.getNiceSpeed());
+                        pw.println(sentry.getNiceDate() + "," + sentry.getNiceTime() + "," + sentry.getNiceSpeed());
+                    } else if (entry.getType() == LogEntry.GROUP_INFO_ENTRY) {
+                        pw.println(entry.getMain());
                     }
                 }
                 pw.println();
