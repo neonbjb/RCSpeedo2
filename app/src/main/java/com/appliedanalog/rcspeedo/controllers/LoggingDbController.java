@@ -87,13 +87,16 @@ public class LoggingDbController extends SQLiteOpenHelper{
 		do{
 			String name = curs.getString(1);
             int type = curs.getInt(3);
-			if(type == LogEntry.EMPTY_ENTRY) {
-                continue;
-            }
 
             if(!logs.containsKey(name)) {
                 logs.put(name, new ModelLog(name));
             }
+
+            if(type == LogEntry.EMPTY_ENTRY) {
+                continue;
+            }
+
+            // Add any entry that is not empty.
 			ModelLog log = logs.get(name);
 			try{
 				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
@@ -123,8 +126,8 @@ public class LoggingDbController extends SQLiteOpenHelper{
 			}
 			try{
 				log.addEntry(
-						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(4),
-												   curs.getString(5), curs.getString(6),
+						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
+												   curs.getString(4), curs.getString(6),
 								      			   curs.getString(7), curs.getString(8)));
 			}catch(Exception e){
 				System.out.println("Parse exception with a log date!");
