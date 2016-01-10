@@ -5,6 +5,7 @@
         <item
             android:id="@+id/main_screen_nav_button"
             android:icon="@android:drawable/ic_menu_compass"
+            android:checkable="false"
             android:title="@string/main_title" />
         <item
             android:id="@+id/clear_speeds"
@@ -14,10 +15,12 @@
         <item
             android:id="@+id/log_manager_nav_button"
             android:icon="@android:drawable/ic_menu_agenda"
+            android:checkable="false"
             android:title="@string/log_manager" />
         <item
             android:id="@+id/settings_nav_button"
             android:icon="@android:drawable/ic_menu_preferences"
+            android:checkable="false"
             android:title="@string/settings" />
         <item
             android:id="@+id/help_nav_button"

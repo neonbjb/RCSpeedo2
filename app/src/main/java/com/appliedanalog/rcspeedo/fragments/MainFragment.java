@@ -7,6 +7,7 @@
 
 package com.appliedanalog.rcspeedo.fragments;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,24 +16,33 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.speech.tts.TextToSpeech;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
+import com.appliedanalog.rcspeedo.controllers.LoggingDbController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
 import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.controllers.data.logs.GroupInfoEntry;
+import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
+import com.appliedanalog.rcspeedo.controllers.data.logs.SpeedLogEntry;
 import com.appliedanalog.rcspeedo.views.SpeedViewAdapter;
 
+import java.util.Collection;
 import java.util.Locale;
 
 import static com.appliedanalog.rcspeedo.controllers.SettingsKeys.ENABLE_SOUND_KEY;
@@ -87,7 +97,7 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        final View view = inflater.inflate(R.layout.fragment_main, container, false);
 
         mSpeed = (TextView)view.findViewById(R.id.tSpeed);
         mHighestSpeed = (TextView)view.findViewById(R.id.tHighestSpeed);
@@ -111,6 +121,19 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                 } else {
                     Log.v(TAG, "Starting the DopplerController..");
                     DopplerController.getInstance().start();
+                }
+            }
+        });
+
+        FloatingActionButton fab = (FloatingActionButton)view.findViewById(R.id.fabSaveLog);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (DopplerController.getInstance().getDetectedSpeeds().size() <= 0) {
+                    Toast toast = Toast.makeText(getContext(), Strings.getInstance().ERR_NO_SPEEDS, Toast.LENGTH_SHORT);
+                    toast.show();
+                } else {
+                    showSaveLogDialog();
                 }
             }
         });
@@ -174,7 +197,7 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
         getActivity().runOnUiThread(new Runnable() {
             public void run() {
                 mHighestSpeed.setText(Strings.getInstance().HIGH_SPEED_IND +
-                                      UnitManager.getInstance().getDisplaySpeed(aNewHighestSpeedMps.getSpeed()));
+                        UnitManager.getInstance().getDisplaySpeed(aNewHighestSpeedMps.getSpeed()));
             }
         });
     }
@@ -215,5 +238,66 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                 }
             }
         });
+    }
+
+    /**
+     * Show a dialog to let the user to pick the desired log and start logging to it.
+     */
+    private void showSaveLogDialog(){
+        final LoggingDbController ldb = LoggingDbController.getInstance(getContext());
+        Collection<ModelLog> models = ldb.getAllModels();
+        if(models.size() <= 0){
+            Toast toast = Toast.makeText(getContext(), Strings.getInstance().ERR_NO_LOGS, Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
+
+        final Dialog createDlg = new Dialog(getActivity());
+        createDlg.setContentView(R.layout.picklogdlg);
+        createDlg.setTitle(Strings.getInstance().PICK_LOG_TITLE);
+
+        final Spinner lAvailableLogs = (Spinner)createDlg.findViewById(R.id.lAvailableLogs);
+        final Button bPickLog = (Button)createDlg.findViewById(R.id.bPickLog);
+        final Button bCancelLogging = (Button)createDlg.findViewById(R.id.bCancelLogging);
+        final EditText tExtraInfo = (EditText)createDlg.findViewById(R.id.tExtraInfo);
+
+        //Set up spinner adapter
+        ArrayAdapter<String> laLogs = new ArrayAdapter<String>(getContext(), R.layout.logs);
+        lAvailableLogs.setAdapter(laLogs);
+        laLogs.clear();
+        for(ModelLog next : models) {
+            laLogs.add(next.getName());
+        }
+
+        //Add action handlers for button.
+        bCancelLogging.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                createDlg.hide();
+            }
+        });
+
+        bPickLog.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                String logname = lAvailableLogs.getSelectedItem().toString();
+                ModelLog log = ldb.getModelLog(logname);
+                if(log == null) {
+                    Toast toast = Toast.makeText(getContext(), Strings.getInstance().ERR_NO_LOGS, Toast.LENGTH_SHORT);
+                    toast.show();
+                    return;
+                }
+
+                int groupId = ldb.generateGroupId();
+                String extraInfo = tExtraInfo.getText().toString();
+                if(!extraInfo.trim().isEmpty()) {
+                    ldb.addLogEntry(new GroupInfoEntry(groupId, extraInfo), log);
+                }
+                for (DetectedSpeed speed : DopplerController.getInstance().getDetectedSpeeds()) {
+                    ldb.addLogEntry(new SpeedLogEntry(speed.getTimestamp(), speed.getSpeed(), groupId), log);
+                }
+                DopplerController.getInstance().clearSpeeds();
+                createDlg.hide();
+            }
+        });
+        createDlg.show();
     }
 }
