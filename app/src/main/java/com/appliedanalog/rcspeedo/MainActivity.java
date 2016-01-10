@@ -29,7 +29,7 @@ import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
-import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.controllers.UnitManager;
 import com.appliedanalog.rcspeedo.fragments.LogManagerFragment;
 import com.appliedanalog.rcspeedo.fragments.MainFragment;
 import com.appliedanalog.rcspeedo.fragments.SettingsFragment;

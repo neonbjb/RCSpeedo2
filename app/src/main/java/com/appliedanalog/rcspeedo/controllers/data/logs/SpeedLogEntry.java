@@ -7,7 +7,7 @@
 
 package com.appliedanalog.rcspeedo.controllers.data.logs;
 
-import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.controllers.UnitManager;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;

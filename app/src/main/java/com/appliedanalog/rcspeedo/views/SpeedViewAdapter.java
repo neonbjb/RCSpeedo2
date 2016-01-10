@@ -21,7 +21,7 @@ import com.appliedanalog.rcspeedo.R;
 import com.appliedanalog.rcspeedo.controllers.DopplerController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
-import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.controllers.UnitManager;
 
 import java.util.ArrayList;
 

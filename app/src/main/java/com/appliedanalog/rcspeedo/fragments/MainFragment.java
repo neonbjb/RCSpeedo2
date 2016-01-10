@@ -36,7 +36,7 @@ import com.appliedanalog.rcspeedo.controllers.LoggingDbController;
 import com.appliedanalog.rcspeedo.controllers.Strings;
 import com.appliedanalog.rcspeedo.controllers.WeatherController;
 import com.appliedanalog.rcspeedo.controllers.data.DetectedSpeed;
-import com.appliedanalog.rcspeedo.controllers.data.UnitManager;
+import com.appliedanalog.rcspeedo.controllers.UnitManager;
 import com.appliedanalog.rcspeedo.controllers.data.logs.GroupInfoEntry;
 import com.appliedanalog.rcspeedo.controllers.data.logs.ModelLog;
 import com.appliedanalog.rcspeedo.controllers.data.logs.SpeedLogEntry;

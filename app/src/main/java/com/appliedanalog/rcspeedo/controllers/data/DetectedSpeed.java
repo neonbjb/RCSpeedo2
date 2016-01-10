@@ -7,6 +7,8 @@
 
 package com.appliedanalog.rcspeedo.controllers.data;
 
+import com.appliedanalog.rcspeedo.controllers.UnitManager;
+
 import java.sql.Date;
 import java.text.DateFormat;
 

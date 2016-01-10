@@ -40,7 +40,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
 
     /**
      * Fetches the Singleton instance.
-     * @param context Activity context.
+     * @param context Activity mContext.
      * @return
      */
 	public static LoggingDbController getInstance(Context aContext){
