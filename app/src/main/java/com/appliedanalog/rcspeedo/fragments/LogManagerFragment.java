@@ -176,17 +176,23 @@ public class LogManagerFragment extends Fragment {
         LoggingDbController ldb = LoggingDbController.getInstance(getActivity().getApplicationContext());
         Collection<ModelLog> alllogs = ldb.getAllModels();
         Iterator<ModelLog> iter = alllogs.iterator();
+        String defaultModel = ldb.getDefaultModel();
 
         //refresh the logs in that folder
         mLogs.clear();
         mLogMap.clear();
         int possel = -1;
-        int pos = 0;
         while (iter.hasNext()) {
             ModelLog next = iter.next();
             mLogs.add(next.getName());
             mLogMap.put(next.getName(), next);
-            pos++;
+
+            if (defaultModel != null && next.getName().equals(defaultModel)) {
+                possel = mLogs.getCount() - 1;
+            }
+        }
+        if (possel != -1) {
+            mAvailableLogs.setSelection(possel);
         }
         mIsInitializing = false;
         mFirstSelect = true;
@@ -225,7 +231,8 @@ public class LogManagerFragment extends Fragment {
     }
 
     private void setSelectedLog(ModelLog log) {
-        // @todo - Add any logic necessary when a log is selected by the user.
+        // Set this as the default log going forwards
+        LoggingDbController.getInstance(getContext()).setDefaultModel(log.getName());
     }
 
     private ModelLog getSelectedLog() {

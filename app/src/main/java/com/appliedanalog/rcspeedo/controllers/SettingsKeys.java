@@ -30,6 +30,9 @@ public class SettingsKeys {
     // The temperature unit to use. (C or F)
     public static final String TEMP_UNIT_KEY = "temperature_unit";
 
+    // Default logging model.
+    public static final String DEFAULT_MODEL = "default_model";
+
     // These bindings come from strings.xml - Any modifications there should be made here too.
     // @todo - Make these bindings in code.
     public static final String DOPPLER_MODE_DEFAULT = "default_mode";

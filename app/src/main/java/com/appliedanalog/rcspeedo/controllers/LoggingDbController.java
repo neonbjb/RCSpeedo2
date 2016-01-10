@@ -8,9 +8,11 @@
 package com.appliedanalog.rcspeedo.controllers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.appliedanalog.rcspeedo.controllers.data.logs.LogEntry;
@@ -27,119 +29,153 @@ import java.util.HashMap;
 /**
  * Controller class that manages interaction with the SQLite database to persist logging data.
  */
-public class LoggingDbController extends SQLiteOpenHelper{
+public class LoggingDbController extends SQLiteOpenHelper {
     final String TAG = "LogDbController";
 
-	private static final String TBL = "logsv2";
-	private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
-	private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +	
-									"model varchar(100), loggroup int default 0, type integer default 1, date text, main text, ext1 text, ext2 text, ext3 text);";
+    private static final String TBL = "logsv2";
+    private static final String INSERT_FIELDS = "(model,loggroup,type,date,main,ext1,ext2,ext3)";
+    private static final String APP_TABLE_CREATE = "create table " + TBL + " (id integer auto_increment primary key, " +
+            "model varchar(100), loggroup int default 0, type integer default 1, date text, main text, ext1 text, ext2 text, ext3 text);";
     private final String RCSPEEDO_TEMP_DIR = "/sdcard/data/rcspeedo/";
-	
-	static LoggingDbController sInstance = null;
+
+    static LoggingDbController sInstance = null;
+
+    private String mDefaultModel = null;
+    private Context mContext;
 
     /**
      * Fetches the Singleton instance.
+     *
      * @param context Activity mContext.
      * @return
      */
-	public static LoggingDbController getInstance(Context aContext){
-		if(sInstance == null){
-			sInstance = new LoggingDbController(aContext);
-		}
-		return sInstance;
-	}
-	
-	private LoggingDbController(Context aContext){
-		super(aContext, TBL, null, 2);
-	}
+    public static LoggingDbController getInstance(Context aContext) {
+        if (sInstance == null) {
+            sInstance = new LoggingDbController(aContext);
+        }
+        return sInstance;
+    }
+
+    private LoggingDbController(Context aContext) {
+        super(aContext, TBL, null, 2);
+        mContext = aContext;
+
+        // Pull the default log from SharedPreferences.
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(aContext);
+        mDefaultModel = prefs.getString(SettingsKeys.DEFAULT_MODEL, null);
+    }
 
     /**
      * Add an entry to the specified ModelLog and the backing database. This entry will persist after this method is called.
+     *
      * @param aEntry
      * @param aLog
      */
-	public void addLogEntry(LogEntry aEntry, ModelLog aLog){
+    public void addLogEntry(LogEntry aEntry, ModelLog aLog) {
         aLog.addEntry(aEntry);
-		final String sql = "insert into " + TBL + " " + INSERT_FIELDS + " values ('" + aLog.getName() +
+        final String sql = "insert into " + TBL + " " + INSERT_FIELDS + " values ('" + aLog.getName() +
                 "', '" + aEntry.getLogGroup() + "', '" + aEntry.getType() + "', '" + aEntry.getDateTime() + "', '" + aEntry.getMain() +
                 "', '" + aEntry.getExt1() + "', '" + aEntry.getExt2() + "', '" + aEntry.getExt3() + "');";
         Log.v(TAG, sql);
         getWritableDatabase().execSQL(sql);
-	}
+    }
 
     /**
      * Deletes all entries correspnoding to the specified model.
+     *
      * @param aModel
      */
-	public void deleteModelLog(String aModel){
-		getWritableDatabase().execSQL("delete from " + TBL + " where model='" + aModel + "';");
-	}
+    public void deleteModelLog(String aModel) {
+        getWritableDatabase().execSQL("delete from " + TBL + " where model='" + aModel + "';");
+    }
 
     /**
      * Retrieve a collection of all the available models and their respective entries.
+     *
      * @return
      */
-	public Collection<ModelLog> getAllModels(){
-		HashMap<String, ModelLog> logs = new HashMap<String, ModelLog>();
-		Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + ";", null);
-		if(!curs.moveToFirst()) return logs.values();
-		do{
-			String name = curs.getString(1);
+    public Collection<ModelLog> getAllModels() {
+        HashMap<String, ModelLog> logs = new HashMap<String, ModelLog>();
+        Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + ";", null);
+        if (!curs.moveToFirst()) return logs.values();
+        do {
+            String name = curs.getString(1);
             int type = curs.getInt(3);
 
-            if(!logs.containsKey(name)) {
+            if (!logs.containsKey(name)) {
                 logs.put(name, new ModelLog(name));
             }
 
-            if(type == LogEntry.EMPTY_ENTRY) {
+            if (type == LogEntry.EMPTY_ENTRY) {
                 continue;
             }
 
             // Add any entry that is not empty.
-			ModelLog log = logs.get(name);
-			try{
-				log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
-														curs.getString(4), curs.getString(6),
-									      				curs.getString(7), curs.getString(8)));
-			}catch(Exception e){
-				System.out.println("Parse exception with a log date!");
-				e.printStackTrace();
-			}
-		}while(curs.moveToNext());
-		curs.close();
-		return logs.values();
-	}
+            ModelLog log = logs.get(name);
+            try {
+                log.addEntry(LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
+                        curs.getString(4), curs.getString(6),
+                        curs.getString(7), curs.getString(8)));
+            } catch (Exception e) {
+                System.out.println("Parse exception with a log date!");
+                e.printStackTrace();
+            }
+        } while (curs.moveToNext());
+        curs.close();
+        return logs.values();
+    }
 
     /**
      * Gets the specified Model, filled with its log entries.
+     *
      * @param aModel
      * @return
      */
-	public ModelLog getModelLog(String aModel){
-		Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + " where model='" + aModel + "';", null);
-		ModelLog log = null;
-		if(!curs.moveToFirst()) return null;
-		do{
-			if(log == null){
-				log = new ModelLog(curs.getString(1));
-			}
-			try{
-				log.addEntry(
-						LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
-												   curs.getString(4), curs.getString(6),
-								      			   curs.getString(7), curs.getString(8)));
-			}catch(Exception e){
-				System.out.println("Parse exception with a log date!");
-				e.printStackTrace();
-			}
-		}while(curs.moveToNext());
-		curs.close();
-		return log;
-	}
+    public ModelLog getModelLog(String aModel) {
+        Cursor curs = getReadableDatabase().rawQuery("select * from " + TBL + " where model='" + aModel + "';", null);
+        ModelLog log = null;
+        if (!curs.moveToFirst()) return null;
+        do {
+            if (log == null) {
+                log = new ModelLog(curs.getString(1));
+            }
+            try {
+                log.addEntry(
+                        LogEntry.constructLogEntry(curs.getInt(0), curs.getInt(3), curs.getInt(2), curs.getString(5),
+                                curs.getString(4), curs.getString(6),
+                                curs.getString(7), curs.getString(8)));
+            } catch (Exception e) {
+                System.out.println("Parse exception with a log date!");
+                e.printStackTrace();
+            }
+        } while (curs.moveToNext());
+        curs.close();
+        return log;
+    }
+
+    /**
+     * Fetch the name of the default model to be used. null is returned when no default is specified.
+     * @return
+     */
+    public String getDefaultModel() {
+        return mDefaultModel;
+    }
+
+    /**
+     * Set the default model. This setting persists across application cycles.
+     * @param aDefaultModel
+     */
+    public void setDefaultModel(String aDefaultModel) {
+        mDefaultModel = aDefaultModel;
+
+        SharedPreferences.Editor ed = PreferenceManager.getDefaultSharedPreferences(mContext).edit();
+        ed.putString(SettingsKeys.DEFAULT_MODEL, aDefaultModel);
+        ed.commit();
+    }
 
     /**
      * Generates a CSV file with all of the entries bound to the specified model.
+     *
      * @param aLog The model to scan.
      * @return
      */
@@ -155,10 +191,10 @@ public class LoggingDbController extends SQLiteOpenHelper{
             PrintWriter pw = new PrintWriter(new FileWriter(realfile));
             //print out the header
             pw.println(aLog.getName() + "\n");
-            for(LogGroup group : aLog.getLogGroups()) {
+            for (LogGroup group : aLog.getLogGroups()) {
                 // Sort the group for the most appropriate display.
                 group.sort();
-                for(LogEntry entry : group.getLogEntries()) {
+                for (LogEntry entry : group.getLogEntries()) {
                     if (entry.getType() == LogEntry.SPEED_ENTRY) {
                         SpeedLogEntry sentry = (SpeedLogEntry) entry;
                         pw.println(sentry.getNiceDate() + "," + sentry.getNiceTime() + "," + sentry.getNiceSpeed());
@@ -180,13 +216,14 @@ public class LoggingDbController extends SQLiteOpenHelper{
 
     /**
      * Generates a GroupId value that is unique in the backing database.
+     *
      * @return
      */
     public int generateGroupId() {
         // Start with a good candidate.
         int potentialGroupId = (int) System.currentTimeMillis();
         // Check that it is unique
-        while(!isIdUnique(potentialGroupId)) {
+        while (!isIdUnique(potentialGroupId)) {
             potentialGroupId++;
         }
         return potentialGroupId;
@@ -195,18 +232,18 @@ public class LoggingDbController extends SQLiteOpenHelper{
     // Interface methods for SQLiteOpenHelper.
 
     @Override
-    public void onCreate(SQLiteDatabase aDb){
+    public void onCreate(SQLiteDatabase aDb) {
         aDb.execSQL(APP_TABLE_CREATE);
     }
-	
-	@Override
-	public void onUpgrade(SQLiteDatabase aDb, int oldVersion, int newVersion) {
-		//called when alter table is needed, will be implemented if/when it is needed
-	}
+
+    @Override
+    public void onUpgrade(SQLiteDatabase aDb, int oldVersion, int newVersion) {
+        //called when alter table is needed, will be implemented if/when it is needed
+    }
 
     private boolean isIdUnique(int aId) {
         // IDs of 0 are invalid
-        if(aId == 0) {
+        if (aId == 0) {
             return false;
         }
 
@@ -215,7 +252,7 @@ public class LoggingDbController extends SQLiteOpenHelper{
             boolean result = curs.moveToFirst();
             curs.close();
             return !result;
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             // Make a wild guess.
             return true;

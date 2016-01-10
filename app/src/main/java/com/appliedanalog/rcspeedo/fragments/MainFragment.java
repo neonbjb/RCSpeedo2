@@ -261,12 +261,20 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
         final Button bCancelLogging = (Button)createDlg.findViewById(R.id.bCancelLogging);
         final EditText tExtraInfo = (EditText)createDlg.findViewById(R.id.tExtraInfo);
 
-        //Set up spinner adapter
+        //Set up spinner adapter. Auto-select the default log, if it is available.
         ArrayAdapter<String> laLogs = new ArrayAdapter<String>(getContext(), R.layout.logs);
+        String defaultModelName = ldb.getDefaultModel();
         lAvailableLogs.setAdapter(laLogs);
         laLogs.clear();
+        int defaultModelIndex = -1;
         for(ModelLog next : models) {
             laLogs.add(next.getName());
+            if (defaultModelName != null && next.getName().equals(defaultModelName)) {
+                defaultModelIndex = laLogs.getCount() - 1;
+            }
+        }
+        if (defaultModelIndex != -1) {
+            lAvailableLogs.setSelection(defaultModelIndex);
         }
 
         //Add action handlers for button.
@@ -296,6 +304,9 @@ public class MainFragment extends Fragment implements DopplerController.DopplerL
                 }
                 DopplerController.getInstance().clearSpeeds();
                 createDlg.hide();
+
+                // Set this as the default model going forwards.
+                ldb.setDefaultModel(log.getName());
             }
         });
         createDlg.show();
